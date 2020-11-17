@@ -13,57 +13,67 @@ public class JwtProperties {
     private int tokenExpirationDays;
     private int refreshTokenExpirationDays;
 
-    public JwtProperties(Builder builder) {
-        keyLocation = builder.keyLocation;
-        keyAlias = builder.keyAlias;
-        keyPass = builder.keyPass;
-        issuer = builder.issuer;
-        subscriber = builder.subscriber;
-        tokenExpirationDays = builder.tokenExpirationDays;
-        refreshTokenExpirationDays = builder.refreshTokenExpirationDays;
-        enabled = builder.enabled;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public static class Builder {
-        private String keyLocation;
-        private String keyAlias;
-        private String keyPass;
-        private String issuer;
-        private boolean enabled = true;
-        private String subscriber = "all";
-        private int tokenExpirationDays = 5;
-        private int refreshTokenExpirationDays = 10;
-
-        public Builder(String keyAlias, String keyLocation, String keyPassword, String keyIssuer) {
-            this.keyLocation = keyLocation;
-            this.keyPass = keyPassword;
-            this.issuer = keyIssuer;
-            this.keyAlias = keyAlias;
-        }
-
-        public Builder subscriber(String subscriber) {
-            this.subscriber = subscriber;
-            return this;
-        }
-
-        public Builder tokenExpirationDay(int tokenExpirationDays) {
-            this.tokenExpirationDays = tokenExpirationDays;
-            return this;
-        }
-
-        public Builder refreshTokenExpirationDays(int refreshTokenExpirationDays) {
-            this.refreshTokenExpirationDays = refreshTokenExpirationDays;
-            return this;
-        }
-
-        public Builder enabled(boolean enabled) {
-            this.enabled = enabled;
-            return this;
-        }
-
-        public JwtProperties build() {
-            return new JwtProperties(this);
-        }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
+    public String getKeyLocation() {
+        return keyLocation;
+    }
+
+    public void setKeyLocation(String keyLocation) {
+        this.keyLocation = keyLocation;
+    }
+
+    public String getKeyAlias() {
+        return keyAlias;
+    }
+
+    public void setKeyAlias(String keyAlias) {
+        this.keyAlias = keyAlias;
+    }
+
+    public String getKeyPass() {
+        return keyPass;
+    }
+
+    public void setKeyPass(String keyPass) {
+        this.keyPass = keyPass;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getSubscriber() {
+        return subscriber;
+    }
+
+    public void setSubscriber(String subscriber) {
+        this.subscriber = subscriber;
+    }
+
+    public int getTokenExpirationDays() {
+        return tokenExpirationDays;
+    }
+
+    public void setTokenExpirationDays(int tokenExpirationDays) {
+        this.tokenExpirationDays = tokenExpirationDays;
+    }
+
+    public int getRefreshTokenExpirationDays() {
+        return refreshTokenExpirationDays;
+    }
+
+    public void setRefreshTokenExpirationDays(int refreshTokenExpirationDays) {
+        this.refreshTokenExpirationDays = refreshTokenExpirationDays;
+    }
 }
