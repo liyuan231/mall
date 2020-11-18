@@ -1,3 +1,4 @@
 target
 .idea
 mall-admin-api.iml
+#src/main/resources/static/admin

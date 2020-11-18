@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserDetailsService {
@@ -32,12 +33,6 @@ public class UserServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.role);
         AssertUtils.mallUserNotNull(mallUser);
-//        List<MallPermission> mallPermissions = permissionService.queryByRoleId(mallUser.getRole(), MallPermission.Column.permission);
-//        Collection<GrantedAuthority> authorities = new LinkedList<>();
-//        authorities.add(new SimpleGrantedAuthority("ROLE_" + roleService.queryById(mallUser.getRole()).getName()));
-//        for (MallPermission mallPermission : mallPermissions) {
-//            authorities.add(new SimpleGrantedAuthority(mallPermission.getPermission()));
-//        }
         return new User(username, "[PASSWORD]", AuthorityUtils.NO_AUTHORITIES);
     }
 
@@ -57,5 +52,16 @@ public class UserServiceImpl implements UserDetailsService {
         MallUser mallUser = queryByUsername(user.getUsername());
         Assert.isNull(mallUser, "用户名已存在！");
         return userMapper.insertSelective(user);
+    }
+
+    public List<MallUser> querySelective(String username, MallUser.Column... columns) {
+        MallUserExample mallUserExample = new MallUserExample();
+        MallUserExample.Criteria criteria = mallUserExample.createCriteria();
+        criteria.andUsernameLike("%" + username + "%");
+        return userMapper.selectByExampleSelective(mallUserExample, columns);
+    }
+
+    public List<MallUser> querySelective(MallUser.Column... columns) {
+        return querySelective("", columns);
     }
 }
