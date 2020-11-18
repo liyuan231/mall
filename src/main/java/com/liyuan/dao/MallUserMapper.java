@@ -1,7 +1,7 @@
 package com.liyuan.dao;
 
-import com.school.model.MallUser;
-import com.school.model.MallUserExample;
+import com.liyuan.model.MallUser;
+import com.liyuan.model.MallUserExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

@@ -1,7 +1,7 @@
 package com.liyuan.dao;
 
-import com.school.model.MallPermission;
-import com.school.model.MallPermissionExample;
+import com.liyuan.model.MallPermission;
+import com.liyuan.model.MallPermissionExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

@@ -1,8 +1,9 @@
 package com.liyuan.service;
 
 import com.liyuan.dao.MallRoleMapper;
-import com.school.model.MallRole;
-import com.school.model.MallRoleExample;
+
+import com.liyuan.model.MallRole;
+import com.liyuan.model.MallRoleExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

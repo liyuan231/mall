@@ -1,6 +1,7 @@
 package com.liyuan.utils;
 
-import com.school.model.MallUser;
+
+import com.liyuan.model.MallUser;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class AssertUtils {

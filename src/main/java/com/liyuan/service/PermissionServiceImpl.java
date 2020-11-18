@@ -1,8 +1,8 @@
 package com.liyuan.service;
 
 import com.liyuan.dao.MallPermissionMapper;
-import com.school.model.MallPermission;
-import com.school.model.MallPermissionExample;
+import com.liyuan.model.MallPermission;
+import com.liyuan.model.MallPermissionExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

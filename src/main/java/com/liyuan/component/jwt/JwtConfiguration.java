@@ -67,7 +67,7 @@ public class JwtConfiguration {
         return new AuthenticationFailureHandler() {
             @Override
             public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                String build = ResponseUtils.build(HttpStatus.OK.value(), "登录失败！");
+                String build = ResponseUtils.build(HttpStatus.OK.value(), "用户名或密码错误！");
                 ResponseUtils.printJson(response, build);
             }
         };
