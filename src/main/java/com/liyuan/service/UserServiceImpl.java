@@ -1,5 +1,7 @@
 package com.liyuan.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.liyuan.dao.MallUserMapper;
 import com.liyuan.model.MallUser;
 import com.liyuan.model.MallUserExample;
@@ -54,14 +56,20 @@ public class UserServiceImpl implements UserDetailsService {
         return userMapper.insertSelective(user);
     }
 
-    public List<MallUser> querySelective(String username, MallUser.Column... columns) {
-        MallUserExample mallUserExample = new MallUserExample();
-        MallUserExample.Criteria criteria = mallUserExample.createCriteria();
-        criteria.andUsernameLike("%" + username + "%");
-        return userMapper.selectByExampleSelective(mallUserExample, columns);
+    public int updateSelectiveById(MallUser mallUser) {
+        return userMapper.updateByPrimaryKeySelective(mallUser);
     }
 
-    public List<MallUser> querySelective(MallUser.Column... columns) {
-        return querySelective("", columns);
+    public PageInfo querySelective(String keyWord, Integer page, Integer pageSize, MallUser.Column... columns) {
+        MallUserExample mallUserExample = new MallUserExample();
+        MallUserExample.Criteria criteria = mallUserExample.createCriteria();
+        criteria.andUsernameLike("%" + keyWord + "%");
+        PageHelper.startPage(page, pageSize);
+        List<MallUser> mallUsers = userMapper.selectByExampleSelective(mallUserExample, columns);
+        return new PageInfo(mallUsers);
+    }
+
+    public void deleteById(Integer id) {
+        userMapper.deleteByPrimaryKey(id);
     }
 }

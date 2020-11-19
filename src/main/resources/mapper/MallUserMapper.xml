@@ -11,7 +11,7 @@
     <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="mobile" jdbcType="VARCHAR" property="mobile" />
     <result column="avatar" jdbcType="VARCHAR" property="avatar" />
-    <result column="update_time" jdbcType="INTEGER" property="updateTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="role" jdbcType="INTEGER" property="role" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -191,7 +191,7 @@
       avatar, update_time, `role`
       )
     values (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, 
-      #{avatar,jdbcType=VARCHAR}, #{updateTime,jdbcType=INTEGER}, #{role,jdbcType=INTEGER}
+      #{avatar,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{role,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.liyuan.model.MallUser">
@@ -237,7 +237,7 @@
         #{avatar,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null">
-        #{updateTime,jdbcType=INTEGER},
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="role != null">
         #{role,jdbcType=INTEGER},
@@ -277,7 +277,7 @@
         avatar = #{record.avatar,jdbcType=VARCHAR},
       </if>
       <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=INTEGER},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.role != null">
         `role` = #{record.role,jdbcType=INTEGER},
@@ -298,7 +298,7 @@
       `password` = #{record.password,jdbcType=VARCHAR},
       mobile = #{record.mobile,jdbcType=VARCHAR},
       avatar = #{record.avatar,jdbcType=VARCHAR},
-      update_time = #{record.updateTime,jdbcType=INTEGER},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       `role` = #{record.role,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -324,7 +324,7 @@
         avatar = #{avatar,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=INTEGER},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="role != null">
         `role` = #{role,jdbcType=INTEGER},
@@ -342,7 +342,7 @@
       `password` = #{password,jdbcType=VARCHAR},
       mobile = #{mobile,jdbcType=VARCHAR},
       avatar = #{avatar,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
       `role` = #{role,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

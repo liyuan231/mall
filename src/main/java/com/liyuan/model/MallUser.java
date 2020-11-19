@@ -1,5 +1,6 @@
 package com.liyuan.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,7 +57,7 @@ public class MallUser {
      *
      * @mbg.generated
      */
-    private Integer updateTime;
+    private LocalDateTime updateTime;
 
     /**
      *
@@ -195,7 +196,7 @@ public class MallUser {
      *
      * @mbg.generated
      */
-    public Integer getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
@@ -207,7 +208,7 @@ public class MallUser {
      *
      * @mbg.generated
      */
-    public void setUpdateTime(Integer updateTime) {
+    public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -317,7 +318,7 @@ public class MallUser {
         password("password", "password", "VARCHAR", true),
         mobile("mobile", "mobile", "VARCHAR", false),
         avatar("avatar", "avatar", "VARCHAR", false),
-        updateTime("update_time", "updateTime", "INTEGER", false),
+        updateTime("update_time", "updateTime", "TIMESTAMP", false),
         role("role", "role", "INTEGER", true);
 
         /**
