@@ -10,11 +10,7 @@
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-    <!-- DataTables -->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">-->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">-->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">-->
-    <!-- Theme style -->
+
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
     <script src="../dist/js/axios.js"></script>
     <script src="../dist/js/vue.js"></script>
@@ -279,39 +275,152 @@
                             <div class="card-header">
                                 <h3 class="card-title">收货地址管理</h3>
                             </div>
+                            <div class="left  col-2">
+                                <button @click="exportAllUserInfos()" class="btn btn-block btn-success">导出
+                                </button>
+                            </div>
                             <!-- /.card-header -->
                             <div class="card-body">
                                 <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
+                                        <th>id</th>
+                                        <th>用户名</th>
+                                        <th>联系人</th>
+                                        <th>手机号</th>
+                                        <th>详细地址</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>此处要获取所有的用户信息</td>
-                                        <td>Internet
-                                            Explorer 4.0
+                                    <tr v-for="(i,index) of pageInfo.list" role="row">
+                                        <td>{{i.address.id}}</td>
+                                        <td>{{i.user.username}}</td>
+                                        <td>{{i.address.name}}</td>
+                                        <td>{{i.address.mobile}}</td>
+                                        <td>{{i.address.addressDetail}}</td>
+                                        <td>
+                                            <button type="button" @click="queryAddressById(i.address.id)"
+                                                    class=" btn btn-block btn-primary " data-toggle="modal"
+                                                    data-target="#myModal">修改
+                                            </button>
+                                            <button type="button" @click="setDeletedAddressId(i.address.id)"
+                                                    class=" btn btn-block btn-danger " data-toggle="modal"
+                                                    data-target="#deleteModal">删除
+                                            </button>
                                         </td>
-                                        <td>Win 95+</td>
-                                        <td> 4</td>
-                                        <td>X</td>
                                     </tr>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-7">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
+                                            <ul class="pagination">
+                                                <li class="paginate_button page-item previous disabled "
+                                                    v-if="pageInfo.hasPreviousPage"
+
+                                                    id="example1_previous"
+                                                    @click="this.retrieveAddressByPageAndPageSize(pageInfo.prePage,pageInfo.pageSize)">
+                                                    <a href="#" aria-controls="example1"
+                                                       data-dt-idx="0" tabindex="0"
+                                                       class="page-link">上一页</a>
+                                                </li>
+                                                <li @click="this.retrieveAddressByPageAndPageSize(item,pageInfo.pageSize)"
+                                                    v-for="item of pageInfo.navigatepageNums"
+                                                    class="paginate_button page-item"
+                                                    :class="item===pageInfo.pageNum?'active':''" :key="item">
+                                                    <a href="#"
+                                                       aria-controls="example1"
+                                                       data-dt-idx="item"
+                                                       tabindex="0"
+                                                       class="page-link">{{item}}</a>
+                                                </li>
+                                                <li v-if="pageInfo.hasNextPage"
+                                                    @click="this.retrieveAddressByPageAndPageSize(pageInfo.nextPage,pageInfo.pageSize)"
+                                                    class="paginate_button page-item next disabled" id="example1_next">
+                                                    <a href="#" aria-controls="example1" data-dt-idx="2" tabindex="0"
+                                                       class="page-link">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="myModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <h4 class="modal-title"></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label for="exampleInputEmail1">用户名</label>
+                                                            <input type="email" class="form-control"
+                                                                   id="exampleInputEmail1"
+                                                                   v-model="theAddress.user.username"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="phone">联系人</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="phone"
+                                                                   v-model="theAddress.address.name">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="role">手机号</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="role"
+                                                                   v-model="theAddress.address.mobile">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="role">详细地址</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="addressDetail"
+                                                                   v-model="theAddress.address.addressDetail">
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary"
+                                                                @click="updateAddressById()">修改
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal fade" id="deleteModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <!-- /.card-body -->
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger"
+                                                                @click="deleteAddressById()">删除
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -369,9 +478,7 @@
             isFirstPage: true,
             isLastPage: false,
             lastPage: 8,
-            list: [
-                {id: "-1", username: "test@qq.com", mobile: "test-18719138325", role: 1}
-            ],
+            list: [],
             navigateFirstPage: 1,
             navigateLastPage: 8,
             navigatePages: 8,
@@ -385,75 +492,28 @@
             total: -1,
         },
         keyWord: "",
-        theUser: {},
-        newUser: {},
-        deletedUserId: -1
+        deletedAddressId: -1,
+        theAddress: {
+            user: {},
+            address: {}
+        }
     };
     var methods = {
-        queryUserById: function (id) {
-            axios.get("/user/queryUserById?id=" + id)
-                .then(function (response) {
-                    console.log(response.data);
-                    if (response.data.code === 200) {
-                        this.app.theUser = response.data.data;
-                    }
-                })
-                .catch(function (err) {
-                    console.log(err);
-                })
+        setDeletedAddressId: function (id) {
+            this.deletedAddressId = id;
+            this.deletedAddressId = id;
         },
-        updateUserById: function () {
-            console.log("修改用户信息！");
-            console.log(this.theUser);
-            axios.post("/user/updateUserById", {
-                id: this.theUser.id,
-                username: this.theUser.username,
-                mobile: this.theUser.mobile,
-                role: this.theUser.role
-            }).then(function (response) {
-                if (response.data.code === 200) {
-                    alert("修改成功！!!");
-                    $("#myModal").modal("hide");
-                    this.retrieveUserByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
-                    // this.mounted();
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        },
-        addUser: function (e) {
-            console.log(this.newUser);
-            if (this.newUser.username != null) {
-                axios.post("/user/add", {
-                    username: this.newUser.username,
-                    mobile: this.newUser.mobile,
-                    role: this.newUser.role
-                }).then(function (response) {
-                    if (response.data.code === 200) {
-                        alert("添加成功！");
-                        $("#addUserModal").modal("hide");
-                    }
-                    this.retrieveUserByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
-                }).catch(function (err) {
-                    console.log(err);
-                });
-            } else {
-                alert("用户名不合法！");
-            }
-        },
-        setDeletedUserId: function (id) {
-            this.deletedUserId = id;
-        },
-        deleteUserById: function () {
-            if (this.deletedUserId === -1) {
+        deleteAddressById: function () {
+            if (this.deletedAddressId === -1) {
                 return;
             }
-            console.log("delete user ->" + this.deletedUserId)
-            axios.delete("/user/delete/" + this.deletedUserId, {})
+            console.log("delete address ->" + this.deletedAddressId)
+            axios.delete("/address/delete/" + this.deletedAddressId, {})
                 .then(function (response) {
                     if (response.data.code === 200) {
-                        console.log("删除一个用户成功！");
-                        retrieveUserByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                        console.log("删除一个地址成功！");
+                        retrieveAddressByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                        $("#deleteModal").modal("hide");
                     }
                 }).catch(function (err) {
                 console.log(err);
@@ -462,12 +522,44 @@
         },
         exportAllUserInfos: function () {
             alert("导出模块之后一起加上@");
+        },
+        queryAddressById: function (id) {
+            axios.get("/address/queryAddressById/" + id)
+                .then(function (response) {
+                    console.log(response.data);
+                    if (response.data.code === 200) {
+                        this.app.theAddress = response.data.data;
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                })
+        },
+        updateAddressById: function (id) {
+            console.log("修改地址信息！");
+            console.log(this.theAddress);
+            axios.post("/address/updateAddressById", {
+                id: this.theAddress.address.id,
+                // username: this.theUser.username,
+                name: this.theAddress.address.name,
+                mobile: this.theAddress.address.mobile,
+                addressDetail: this.theAddress.address.addressDetail
+            }).then(function (response) {
+                if (response.data.code === 200) {
+                    alert("修改成功！!!");
+                    $("#myModal").modal("hide");
+                    this.retrieveAddressByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                    // this.mounted();
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         }
     };
     var computed = {};
     var mounted = function () {
-        console.log("初始化第一页的用户");
-        axios.get("/user/listSearch?page=" + 1 + "&pageSize=" + this.pageInfo.pageSize)
+        console.log("初始化第一页的地址");
+        axios.get("/address/listSearch?page=" + 1 + "&pageSize=" + this.pageInfo.pageSize)
             .then(function (response) {
                 console.log(response.data);
                 if (response.data.code === 200) {
@@ -477,9 +569,9 @@
             console.log(e);
         });
     }
-    var retrieveUserByPageAndPageSize = function (page, pageSize) {
-        console.log("获取规定的用户");
-        axios.get("/user/listSearch?page=" + page + "&pageSize=" + pageSize)
+    var retrieveAddressByPageAndPageSize = function (page, pageSize) {
+        console.log("获取规定的地址");
+        axios.get("/address/listSearch?page=" + page + "&pageSize=" + pageSize)
             .then(function (response) {
                 console.log(response.data);
                 if (response.data.code === 200) {

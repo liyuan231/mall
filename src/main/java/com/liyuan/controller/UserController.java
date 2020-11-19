@@ -33,7 +33,6 @@ public class UserController {
                              @RequestParam("pageSize") Integer pageSize,
                              @RequestParam(value = "keyWord", defaultValue = "", required = false) String keyWord) {
         PageInfo pageInfo = userService.querySelective(keyWord, page, pageSize, MallUser.Column.id, MallUser.Column.username, MallUser.Column.role, MallUser.Column.mobile);
-//        List<MallUser> mallUsers = userService.querySelective(MallUser.Column.id, MallUser.Column.username, MallUser.Column.role, MallUser.Column.mobile);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取所哟用户成功！包括关键字", pageInfo);
     }
 

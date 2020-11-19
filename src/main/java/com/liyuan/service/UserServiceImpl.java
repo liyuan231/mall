@@ -69,6 +69,11 @@ public class UserServiceImpl implements UserDetailsService {
         return new PageInfo(mallUsers);
     }
 
+    public PageInfo querySelective(Integer page, Integer pageSize, MallUser.Column... columns) {
+        return querySelective("", page, pageSize, columns);
+    }
+
+
     public void deleteById(Integer id) {
         userMapper.deleteByPrimaryKey(id);
     }
