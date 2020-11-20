@@ -1,14 +1,8 @@
 package com.liyuan;
 
 import com.github.pagehelper.PageInfo;
-import com.liyuan.model.MallAddress;
-import com.liyuan.model.MallFeedback;
-import com.liyuan.model.MallSearchHistory;
-import com.liyuan.model.MallUser;
-import com.liyuan.service.AddressServiceImpl;
-import com.liyuan.service.FeedbackServiceImpl;
-import com.liyuan.service.SearchHistoryServiceImpl;
-import com.liyuan.service.UserServiceImpl;
+import com.liyuan.model.*;
+import com.liyuan.service.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +80,7 @@ public class test {
     @Autowired
     private FeedbackServiceImpl feedbackService;
 
-//    @Test
+    //    @Test
     public void insertFeedback() {
         PageInfo pageInfo = userService.querySelective(1, 100, MallUser.Column.id);
         List<MallUser> users = pageInfo.getList();
@@ -102,6 +96,74 @@ public class test {
             mallFeedback.setContent("content" + i);
             mallFeedback.setUpdateTime(LocalDateTime.now());
             feedbackService.insertSelective(mallFeedback);
+        }
+    }
+
+    @Autowired
+    private OrderServiceImpl orderService;
+
+    @Test
+    public void insertFakeOrder() {
+        PageInfo pageInfo = userService.querySelective(1, 100, MallUser.Column.id);
+        List<MallUser> users = pageInfo.getList();
+        List<Integer> userIds = new LinkedList<>();
+        for (MallUser user : users) {
+            userIds.add(user.getId());
+        }
+        for (int i = 0; i < 65; i++) {
+            MallOrder order = new MallOrder();
+            int n = (int) (Math.random() * userIds.size());
+            int userId = userIds.get(n);
+            List<MallAddress> mallAddresses = addressService.queryByUserId(userId, MallAddress.Column.id);
+            if (mallAddresses.size() == 0) {
+                continue;
+            }
+            order.setUserId(userId);
+            order.setOrderStatus(0);
+            order.setAftersaleStatus(0);
+
+            order.setAddressId(mallAddresses.get(0).getId());
+            order.setGoodsPrice((float) (Math.random() * 1000));
+            order.setPayId("wx-pay-id" + i);
+            order.setPayTime(LocalDateTime.now());
+            order.setRefundType(0);
+            order.setUpdateTime(LocalDateTime.now());
+            orderService.insertSelective(order);
+
+        }
+    }
+
+
+    @Autowired
+    private CommonQuestionServiceImpl commonQuestionService;
+
+    @Test
+    public void insertCommonQuestion() {
+        for (int i = 0; i < 34; i++) {
+            MallIssue mallIssue = new MallIssue();
+            mallIssue.setQuestion("question" + i);
+            mallIssue.setAnswer("answer" + i);
+            mallIssue.setUpdateTime(LocalDateTime.now());
+            commonQuestionService.insertSelective(mallIssue);
+        }
+    }
+
+
+    @Autowired
+    private AdvertisementServiceImpl advertisementService;
+
+    @Test
+    public void insertAdvertisement() {
+        for (int i = 0; i < 45; i++) {
+            MallAd mallAd = new MallAd();
+            mallAd.setName("标题" + i);
+            mallAd.setContent("内容" + i);
+            mallAd.setPosition(-1);
+            mallAd.setLink("link" + i);
+            mallAd.setStartTime(LocalDateTime.now());
+            mallAd.setEndTime(LocalDateTime.now());
+            mallAd.setUrl("url" + i);
+            advertisementService.insertSelective(mallAd);
         }
     }
 }

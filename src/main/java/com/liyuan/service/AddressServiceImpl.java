@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,8 +32,7 @@ public class AddressServiceImpl {
     }
 
     public int deleteById(Integer id) {
-        int i = addressMapper.deleteByPrimaryKey(id);
-        return i;
+        return addressMapper.deleteByPrimaryKey(id);
     }
 
     public MallAddress queryById(Integer id, MallAddress.Column... columns) {
@@ -41,6 +41,14 @@ public class AddressServiceImpl {
 
     public int updateSelectiveById(MallAddress address) {
         Assert.notNull(address.getId(), "地址id不存在！");
+        address.setUpdateTime(LocalDateTime.now());
         return addressMapper.updateByPrimaryKeySelective(address);
+    }
+
+    public List<MallAddress> queryByUserId(int i, MallAddress.Column... columns) {
+        MallAddressExample mallAddressExample = new MallAddressExample();
+        MallAddressExample.Criteria criteria = mallAddressExample.createCriteria();
+        criteria.andUserIdEqualTo(i);
+        return addressMapper.selectByExampleSelective(mallAddressExample, columns);
     }
 }

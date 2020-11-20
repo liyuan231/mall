@@ -76,5 +76,14 @@
         <table tableName="mall_feedback">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
+        <table tableName="mall_order">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="mall_issue">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="mall_ad">
+            <generatedKey column="id" sqlStatement="mysql"/>
+        </table>
     </context>
 </generatorConfiguration>

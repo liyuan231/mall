@@ -27,6 +27,5 @@ public class SearchHistoryServiceImpl {
 
     public int insertSelective(MallSearchHistory searchHistory) {
         return searchHistoryMapper.insertSelective(searchHistory);
-
     }
 }
