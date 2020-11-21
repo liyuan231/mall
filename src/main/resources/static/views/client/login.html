@@ -1,0 +1,76 @@
+<html lang="en" style="background-image: url('./images/bg.jpg');background-repeat: no-repeat;">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AdminLTE 3 | Log in (v2)</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+    <style>
+        #loginForm {
+            border: 1px solid black;
+            border-radius: 3px;
+            margin: 0 auto;
+            margin-top: 120px;
+            width: 500px;
+            height: 500px;
+            background-color: rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0 0.1rem #c2c2c2;
+        }
+
+        .form-group {
+            padding: 0 60px;
+            width: 100%;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 45px;
+        }
+    </style>
+</head>
+<body class="" style="min-height: 466px;background-color: transparent">
+<div>
+    <form id="loginForm" action="" method="post">
+        <div class="card-header" style="margin-bottom: 30px;">
+            <h2 class="card-title" style="font-size: 30px;">MALL</h2>
+            <span style="vertical-align: bottom">登录</span>
+        </div>
+        <div class="form">
+            <div class="form-group">
+                <label for="exampleInputEmail1">用户名</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" name="username" placeholder="邮箱">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" name="password" placeholder="密码">
+            </div>
+            <div class="form-group clearfix">
+                <button type="submit" style="float: left" class="left col-5 form-control btn btn-success">登录</button>
+                <a href="/register.html">
+                    <button type="button" style="float: right" class="right col-5 form-control btn btn-primary">注册
+                    </button>
+                </a>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../dist/js/adminlte.min.js"></script>
+</body>
+</html>

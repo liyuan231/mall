@@ -21,6 +21,9 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 此UserServicesDetails用于客户端登录
+ */
 @Service
 public class UserServiceImpl implements UserDetailsService {
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -34,9 +37,9 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.role);
+        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username,MallUser.Column.password);
         AssertUtils.mallUserNotNull(mallUser);
-        return new User(username, "[PASSWORD]", AuthorityUtils.NO_AUTHORITIES);
+        return new User(username, mallUser.getPassword(), AuthorityUtils.NO_AUTHORITIES);
     }
 
 

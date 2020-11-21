@@ -5,6 +5,12 @@ import com.github.pagehelper.PageInfo;
 import com.liyuan.dao.MallAdminMapper;
 import com.liyuan.model.MallAdmin;
 import com.liyuan.model.MallAdminExample;
+import com.liyuan.utils.AssertUtils;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -13,13 +19,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class AdministratorServiceImpl {
-
+public class AdministratorServiceImpl implements UserDetailsService {
     @Resource
     private MallAdminMapper adminMapper;
 
     public PageInfo listSearch(String keyword, Integer page, Integer pageSize, MallAdmin.Column... columns) {
-
         MallAdminExample mallAdminExample = new MallAdminExample();
         MallAdminExample.Criteria criteria = mallAdminExample.createCriteria();
         criteria.andUsernameLike("%" + keyword + "%");
@@ -44,5 +48,19 @@ public class AdministratorServiceImpl {
 
     public int deleteById(Integer id) {
         return adminMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        MallAdmin admin = queryByUsername(username);
+        AssertUtils.adminUserNotNull(admin);
+        return new User(username, admin.getPassword(), AuthorityUtils.NO_AUTHORITIES);
+    }
+
+    private MallAdmin queryByUsername(String username) {
+        MallAdminExample adminExample = new MallAdminExample();
+        MallAdminExample.Criteria criteria = adminExample.createCriteria();
+        criteria.andUsernameEqualTo(username);
+        return adminMapper.selectOneByExampleSelective(adminExample);
     }
 }
