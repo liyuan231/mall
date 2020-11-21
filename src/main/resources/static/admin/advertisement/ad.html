@@ -17,6 +17,11 @@
         [v-cloak] {
             display: none;
         }
+
+        .modal-dialog {
+            max-width: 80%;
+            min-width: 400px;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
@@ -303,7 +308,12 @@
                                         <td>{{item.startTime}}</td>
                                         <td>{{item.endTime}}</td>
                                         <td>
-
+                                            <button type="button" class="btn btn-primary"
+                                                    @click="queryAdvertisementById(item.id)"
+                                                    data-toggle="modal"
+                                                    data-target="#myModal">
+                                                修改
+                                            </button>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -338,6 +348,79 @@
                                                        class="page-link">下一页</a>
                                                 </li>
                                             </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="myModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <h4 class="modal-title"></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label for="name">标题</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="name"
+                                                                   v-model="this.theAdvertisement.name">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="link">链接</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="link"
+                                                                   v-model="theAdvertisement.link">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="role">图片</label>
+                                                            <img :src="theAdvertisement.url" alt="">
+                                                            <p>此处需要能够修改图片</p>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="position">位置</label>
+                                                            <input id="position" type="number" class="form-control"
+                                                                   v-model="theAdvertisement.position"/>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="content">内容</label>
+                                                            <textarea v-model="theAdvertisement.content" name=""
+                                                                      class="form-control" id="content" cols="30"
+                                                                      rows="10">
+                                                            </textarea>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="startTime">开始时间</label>
+                                                            <input id="startTime" type="datetime-local"
+                                                                   class="form-control"
+                                                                   v-model="theAdvertisement.startTime"/>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="endTime">结束时间</label>
+                                                            <input type="datetime-local" id="endTime"
+                                                                   class="form-control"
+                                                                   v-model="theAdvertisement.endTime">
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary"
+                                                                @click="updateAdvertisementById()">修改
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -416,13 +499,44 @@
             size: 8,
             total: -1,
         },
+        theAdvertisement: {}
     }
     var methods = {
         exportAllAdvertisementInfos: function () {
             alert("导出模块之后再做！！");
+        },
+        queryAdvertisementById: function (id) {
+            axios.get("/advertisement/queryById/" + id)
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        this.app.theAdvertisement = response.data.data;
+                        console.log(this.theAdvertisement);
+                    }
+                })
+        },
+        updateAdvertisementById: function (id) {
+            axios.post("/advertisement/updateAdvertisementById", {
+                id: this.theAdvertisement.id,
+                name: this.theAdvertisement.name,
+                link: this.theAdvertisement.link,
+                url: this.theAdvertisement.url,
+                position: this.theAdvertisement.position,
+                content: this.theAdvertisement.content,
+                startTime: this.theAdvertisement.startTime,
+                endTime: this.theAdvertisement.endTime
+            }).then(function (response) {
+                if (response.data.code === 200) {
+                    alert("修改成功！");
+                    $("#myModal").modal("hide");
+                }
+                console.log(response.data);
+            }).catch(function (err) {
+                console.log(err);
+            })
         }
+
     };
-    var retrieveOrderByPageAndPageSize = function (page, pageSize) {
+    var retrieveAdvertisementByPageAndPageSize = function (page, pageSize) {
         axios.get("/advertisement/listSearch?page=" + page + "&pageSize=" + pageSize)
             .then(function (response) {
                 if (response.data.code === 200) {
@@ -431,7 +545,6 @@
             }).catch(function (err) {
             console.log(err);
         })
-
     }
 
     var mounted = function () {

@@ -153,8 +153,8 @@ public class test {
     private AdvertisementServiceImpl advertisementService;
 
     @Test
-    public void insertAdvertisement() {
-        for (int i = 0; i < 45; i++) {
+    public void insertAdvertisement() throws InterruptedException {
+        for (int i = 100; i < 245; i++) {
             MallAd mallAd = new MallAd();
             mallAd.setName("标题" + i);
             mallAd.setContent("内容" + i);
@@ -164,6 +164,22 @@ public class test {
             mallAd.setEndTime(LocalDateTime.now());
             mallAd.setUrl("url" + i);
             advertisementService.insertSelective(mallAd);
+        }
+    }
+
+    @Autowired
+    private AdministratorServiceImpl administratorService;
+
+    @Test
+    public void insertAdministrator() {
+        for (int i = 0; i < 45; i++) {
+            MallAdmin admin = new MallAdmin();
+            admin.setUsername(i + "@qq.com");
+            admin.setAvatar("avatar" + i);
+            admin.setRole(-1);
+            admin.setCreateTime(LocalDateTime.now());
+            admin.setLastLoginTime(LocalDateTime.now().plusDays(1));
+            administratorService.insertSelective(admin);
         }
     }
 }

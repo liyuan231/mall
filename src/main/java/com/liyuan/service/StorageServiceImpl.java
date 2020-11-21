@@ -1,0 +1,26 @@
+package com.liyuan.service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.liyuan.dao.MallStorageMapper;
+import com.liyuan.model.MallStorage;
+import com.liyuan.model.MallStorageExample;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+@Service
+public class StorageServiceImpl {
+
+    @Resource
+    private MallStorageMapper storageMapper;
+
+    public PageInfo querySelective(Integer page, Integer pageSize, MallStorage.Column... columns) {
+        MallStorageExample mallStorageExample = new MallStorageExample();
+        PageHelper.startPage(page, pageSize);
+        List<MallStorage> mallStorages = storageMapper.selectByExampleSelective(mallStorageExample, columns);
+        return new PageInfo(mallStorages);
+    }
+
+}

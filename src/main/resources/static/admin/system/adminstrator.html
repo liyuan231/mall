@@ -11,11 +11,18 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <!-- DataTables -->
-    <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <!--        <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">-->
+    <!--        <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">-->
+    <!--        <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">-->
     <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <script src="../dist/js/axios.js"></script>
+    <script src="../dist/js/vue.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -63,7 +70,8 @@
     <aside class="main-sidebar sidebar-collapse sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="" class="brand-link">
-            <img src="../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <img src="../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                 style="opacity: .8">
             <span class="brand-text font-weight-light">MALL</span>
         </a>
         <!-- Sidebar -->
@@ -79,7 +87,8 @@
             </div>
             <!-- Sidebar Menu -->
             <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                    data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                     <li class="nav-item">
@@ -247,7 +256,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="app">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -278,34 +287,143 @@
                                 <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
+                                        <th>id</th>
+                                        <th>用户名</th>
+                                        <th>头像</th>
+                                        <th>等级</th>
+                                        <th>上次登录时间</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>此处要获取所有的用户信息</td>
-                                        <td>Internet
-                                            Explorer 4.0
-                                        </td>
-                                        <td>Win 95+</td>
-                                        <td> 4</td>
-                                        <td>X</td>
+                                    <tr v-for="item of pageInfo.list">
+                                        <td>{{item.id}}</td>
+                                        <td>{{item.username}}</td>
+                                        <td>{{item.avatar}}</td>
+                                        <td>{{item.role}}</td>
+                                        <td>{{item.lastLoginTime}}</td>
+                                        <th>
+                                            <button type="button" class="btn btn-primary col-5 left"
+                                                    data-toggle="modal"
+                                                    data-target="#myModal"
+                                                    @click="queryAdministratorById(item.id)">修改
+                                            </button>
+                                            <button type="button" class="btn btn-danger col-5 right"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteModal"
+                                                    @click="setDeletedAdministratorId(item.id)">删除
+                                            </button>
+                                        </th>
                                     </tr>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-7">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
+                                            <ul class="pagination">
+                                                <li class="paginate_button page-item previous disabled "
+                                                    v-if="pageInfo.hasPreviousPage"
+
+                                                    id="example1_previous"
+                                                    @click="this.retrieveAdministratorByPageAndPageSize(pageInfo.prePage,pageInfo.pageSize)">
+                                                    <a href="#" aria-controls="example1"
+                                                       data-dt-idx="0" tabindex="0"
+                                                       class="page-link">上一页</a>
+                                                </li>
+                                                <li @click="this.retrieveAdministratorByPageAndPageSize(item,pageInfo.pageSize)"
+                                                    v-for="item of pageInfo.navigatepageNums"
+                                                    class="paginate_button page-item"
+                                                    :class="item===pageInfo.pageNum?'active':''" :key="item">
+                                                    <a href="#"
+                                                       aria-controls="example1"
+                                                       data-dt-idx="item"
+                                                       tabindex="0"
+                                                       class="page-link">{{item}}</a>
+                                                </li>
+                                                <li v-if="pageInfo.hasNextPage"
+                                                    @click="this.retrieveAdministratorByPageAndPageSize(pageInfo.nextPage,pageInfo.pageSize)"
+                                                    class="paginate_button page-item next disabled" id="example1_next">
+                                                    <a href="#" aria-controls="example1" data-dt-idx="2" tabindex="0"
+                                                       class="page-link">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="myModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <h4 class="modal-title"></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label for="exampleInputEmail1">用户名</label>
+                                                            <input type="email" class="form-control"
+                                                                   id="exampleInputEmail1"
+                                                                   v-model="theAdministrator.username"
+                                                                   disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="avatar">头像</label>
+                                                            <img :src="theAdministrator.avatar" alt="">
+                                                            <p>此处需要上传头像的修改</p>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="role">等级</label>
+                                                            <input type="number" class="form-control"
+                                                                   id="role"
+                                                                   v-model="theAdministrator.role">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="lastLoginTime">上次登录</label>
+                                                            <input disabled type="text" id="lastLoginTime"
+                                                                   class="form-control"
+                                                                   :value="theAdministrator.lastLoginTime">
+                                                        </div>
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary"
+                                                                @click="updateAdministratorById()">修改
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="deleteModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <!-- /.card-body -->
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default col-5"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger col-5"
+                                                                @click="deleteAdministratorById()">删除
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -322,8 +440,13 @@
     <!--  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
     <!--  以下均为一致，仅需微调即可使用-->
     <!-- /.content-wrapper -->
-    <div id="footer"></div>
-
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+        All rights reserved.
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> v1.0.0
+        </div>
+    </footer>
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
@@ -338,44 +461,110 @@
 <!-- Bootstrap 4 -->
 <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables  & Plugins -->
-<script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 <script src="../plugins/jszip/jszip.min.js"></script>
 <script src="../plugins/pdfmake/pdfmake.min.js"></script>
 <script src="../plugins/pdfmake/vfs_fonts.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <!-- AdminLTE App -->
 <script src="../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../dist/js/demo.js"></script>
-<!-- Page specific script -->
 <script>
-    $(function () {
-        $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-        $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-        });
-    });
-</script>
-<script type="text/javascript">
-    // $("#nav").load('component/nav.html');
-    // $("#aside").load('component/aside.html');
-    $("#footer").load('component/footer.html');
+    var data = {
+        pageInfo: {
+            endRow: 8,
+            firstPage: 1,
+            hasNextPage: true,
+            hasPreviousPage: false,
+            isFirstPage: true,
+            isLastPage: false,
+            lastPage: 8,
+            list: [],
+            navigateFirstPage: 1,
+            navigateLastPage: 8,
+            navigatePages: 8,
+            navigatepageNums: [],
+            nextPage: 2,
+            pageNum: 1,
+            pageSize: 10,
+            pages: 12,
+            prePage: 0,
+            size: 8,
+            total: -1,
+        },
+        theAdministrator: {},
+        deletedAdministratorId: -1
+    };
+    var retrieveAdministratorByPageAndPageSize = function (page, pageSize) {
+        axios.get("/administrator/listSearch?page=" + page + "&pageSize=" + pageSize)
+            .then(function (response) {
+                if (response.data.code === 200) {
+                    this.app.pageInfo = response.data.data;
+                }
+            }).catch(function (err) {
+            console.log(err);
+        })
+    }
+    var methods = {
+        queryAdministratorById: function (id) {
+            axios.get("/administrator/queryById/" + id)
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        this.app.theAdministrator = response.data.data;
+                    }
+                }).catch(function (err) {
+                console.log(err);
+            })
+        },
+        updateAdministratorById: function () {
+            axios.post("/administrator/updateAdministratorById", {
+                id: this.theAdministrator.id,
+                username: this.theAdministrator.username,
+                role: this.theAdministrator.role,
+                avatar: this.theAdministrator.avatar
+            }).then(function (response) {
+                if (response.data.code === 200) {
+                    alert("修改成功！");
+                    $("#myModal").modal("hide");
+                    retrieveAdministratorByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                }
+            })
+        },
+        setDeletedAdministratorId: function (id) {
+            this.deletedAdministratorId = id;
+        },
+        deleteAdministratorById: function () {
+            axios.delete("/administrator/deleteById/" + this.deletedAdministratorId)
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        alert("删除一个管理员成功！");
+                        $("#deleteModal").modal("hide");
+                        retrieveAdministratorByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                    }
+                }).catch(function (err) {
+                console.log(err);
+            });
+        }
+
+    };
+    var mounted = function () {
+        axios.get("/administrator/listSearch?page=1&pageSize=" + this.pageInfo.pageSize)
+            .then(function (response) {
+                if (response.data.code === 200) {
+                    this.app.pageInfo = response.data.data;
+                }
+            }).catch(function (err) {
+            console.log(err);
+        })
+    }
+
+
+    var app = new Vue({
+        el: "#app",
+        data: data,
+        methods: methods,
+        mounted: mounted
+    })
+
 </script>
 </body>
 </html>
