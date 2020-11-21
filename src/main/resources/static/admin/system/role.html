@@ -10,11 +10,6 @@
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-    <!-- DataTables -->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">-->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">-->
-    <!--        <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">-->
-    <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
     <script src="../dist/js/axios.js"></script>
     <script src="../dist/js/vue.js"></script>
@@ -91,8 +86,8 @@
                     data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
+                    <li class="nav-item ">
+                        <a href="#" class="nav-link ">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
                                 用户管理
@@ -107,7 +102,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="../user/address.html" class="nav-link">
+                                <a href="../user/address.html" class="nav-link ">
                                     <i class="far fa-address-book nav-icon"></i>
                                     <p>收货地址管理</p>
                                 </a>
@@ -175,7 +170,7 @@
                         </ul>
                     </li>
                     <li class="nav-item menu-open">
-                        <a href="#" class="nav-link ">
+                        <a href="#" class="nav-link active">
                             <i class="nav-icon fas fa-receipt"></i>
                             <p>
                                 系统管理
@@ -184,7 +179,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../system/adminstrator.html" class="nav-link active">
+                                <a href="../system/adminstrator.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
@@ -196,19 +191,19 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="../system/Cloud-Object-Storage.html" class="nav-link">
+                                <a href="../system/Cloud-Object-Storage.html" class="nav-link ">
                                     <i class="far fa-store-alt nav-icon"></i>
                                     <p>对象存储</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="" class="nav-link">
+                                <a href="#" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
                                     <p>操作日志</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="../system/role.html" class="nav-link">
+                                <a href="../system/role.html" class="nav-link active">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>角色管理</p>
                                 </a>
@@ -256,18 +251,18 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app">
+    <div class="content-wrapper" id="app" v-cloak>
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>管理员</h1>
+                        <h1>角色管理</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">首页</a></li>
-                            <li class="breadcrumb-item ">系统管理</li>
+                            <li class="breadcrumb-item active">系统管理</li>
                         </ol>
                     </div>
                 </div>
@@ -280,7 +275,10 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">管理员</h3>
+                                <h3 class="card-title">角色管理</h3>
+                                <button type="button" class="btn btn-success  offset-9 col-3" data-toggle="modal"
+                                        data-target="#addRoleModal">添加角色
+                                </button>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body">
@@ -288,68 +286,29 @@
                                     <thead>
                                     <tr>
                                         <th>id</th>
-                                        <th>用户名</th>
-                                        <th>头像</th>
-                                        <th>等级</th>
-                                        <th>上次登录时间</th>
+                                        <th>名称</th>
+                                        <th>说明</th>
+                                        <th>添加时间</th>
                                         <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr v-for="item of pageInfo.list">
+                                    <tr v-for="item of roles">
                                         <td>{{item.id}}</td>
-                                        <td>{{item.username}}</td>
-                                        <td>{{item.avatar}}</td>
-                                        <td>{{item.role}}</td>
-                                        <td>{{item.lastLoginTime}}</td>
-                                        <th>
-                                            <button type="button" class="btn btn-primary col-5 left"
-                                                    data-toggle="modal"
-                                                    data-target="#myModal"
-                                                    @click="queryAdministratorById(item.id)">修改
+                                        <td>{{item.name}}</td>
+                                        <td>{{item.desc}}</td>
+                                        <td>{{item.updateTime}}</td>
+                                        <td>
+                                            <button type="button" class="col-5 btn btn-primary" data-target="#myModal"
+                                                    data-toggle="modal" @click="queryRoleById(item.id)">修改
                                             </button>
-                                            <button type="button" class="btn btn-danger col-5 right"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteModal"
-                                                    @click="setDeletedAdministratorId(item.id)">删除
+                                            <button type="button" class="col-5 btn btn-danger" data-toggle="modal"
+                                                    data-target="#deleteModal" @click="setDeletedId(item.id)">删除
                                             </button>
-                                        </th>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-7">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
-                                            <ul class="pagination">
-                                                <li class="paginate_button page-item previous disabled "
-                                                    v-if="pageInfo.hasPreviousPage"
-
-                                                    id="example1_previous"
-                                                    @click="this.retrieveAdministratorByPageAndPageSize(pageInfo.prePage,pageInfo.pageSize)">
-                                                    <a href="#" aria-controls="example1"
-                                                       data-dt-idx="0" tabindex="0"
-                                                       class="page-link">上一页</a>
-                                                </li>
-                                                <li @click="this.retrieveAdministratorByPageAndPageSize(item,pageInfo.pageSize)"
-                                                    v-for="item of pageInfo.navigatepageNums"
-                                                    class="paginate_button page-item"
-                                                    :class="item===pageInfo.pageNum?'active':''" :key="item">
-                                                    <a href="#"
-                                                       aria-controls="example1"
-                                                       data-dt-idx="item"
-                                                       tabindex="0"
-                                                       class="page-link">{{item}}</a>
-                                                </li>
-                                                <li v-if="pageInfo.hasNextPage"
-                                                    @click="this.retrieveAdministratorByPageAndPageSize(pageInfo.nextPage,pageInfo.pageSize)"
-                                                    class="paginate_button page-item next disabled" id="example1_next">
-                                                    <a href="#" aria-controls="example1" data-dt-idx="2" tabindex="0"
-                                                       class="page-link">下一页</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="modal fade" id="myModal"
                                      aria-hidden="true">
                                     <div class="modal-dialog">
@@ -363,40 +322,106 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div style="">
+                                                    <div class="form-group">
+                                                        <button type="button" class="form-control btn btn-success"
+                                                                data-toggle="modal" data-target="#addPermissionModal">
+                                                            添加权限
+                                                        </button>
+                                                    </div>
                                                     <div class="card-body">
                                                         <div class="form-group">
-                                                            <label for="exampleInputEmail1">用户名</label>
-                                                            <input type="email" class="form-control"
-                                                                   id="exampleInputEmail1"
-                                                                   v-model="theAdministrator.username"
-                                                                   disabled>
+                                                            <label for="name">名称</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="name"
+                                                                   v-model="theRole.role.name" disabled>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="avatar">头像</label>
-                                                            <img :src="theAdministrator.avatar" alt="">
-                                                            <p>此处需要上传头像的修改</p>
+                                                            <label for="desc">说明</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="desc"
+                                                                   v-model="theRole.role.desc">
                                                         </div>
 
                                                         <div class="form-group">
-                                                            <label for="role">等级</label>
-                                                            <input type="number" class="form-control"
-                                                                   id="role"
-                                                                   v-model="theAdministrator.role">
+                                                            <label for="time">加入时间</label>
+                                                            <input type="datetime-local" class="form-control"
+                                                                   id="time"
+                                                                   v-model="theRole.role.updateTime" disabled>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label for="lastLoginTime">上次登录</label>
-                                                            <input disabled type="text" id="lastLoginTime"
-                                                                   class="form-control"
-                                                                   :value="theAdministrator.lastLoginTime">
+                                                        <div>
+                                                            <table id="permissions"
+                                                                   class="table table-bordered table-striped">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>id</th>
+                                                                    <th>权限</th>
+                                                                    <th>添加时间</th>
+                                                                    <th>操作</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <tr v-for="item of theRole.permissions">
+                                                                    <td>{{item.id}}</td>
+                                                                    <td>{{item.permission}}</td>
+                                                                    <td>{{item.updateTime}}</td>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="col-12 btn btn-danger"
+                                                                                data-toggle="modal"
+                                                                                data-target="#deletePermissionModal"
+                                                                                @click="deletedPermissionId=item.id">
+                                                                            删除
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="modal fade" id="deletePermissionModal"
+                                                                 aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-body">
+                                                                            <div style="">
+                                                                                <!-- /.card-body -->
+                                                                                <div class="card-footer">
+                                                                                    <button type="button"
+                                                                                            class="btn btn-default"
+                                                                                            data-dismiss="modal">取消
+                                                                                    </button>
+                                                                                    <button type="button"
+                                                                                            class="btn btn-danger"
+                                                                                            @click="deletePermissionById()">
+                                                                                        删除
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="addPermissionModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div style="">
                                                     <!-- /.card-body -->
+                                                    <div class="form-group">
+                                                        <label for="aNewPermission">新权限</label>
+                                                        <input id="aNewPermission" type="text" class="form-control"
+                                                               v-model="aNewPermission" placeholder="请输入权限名称"/>
+                                                    </div>
+
                                                     <div class="card-footer">
-                                                        <button type="button" class="btn btn-default"
-                                                                data-dismiss="modal">取消
-                                                        </button>
-                                                        <button type="button" class="btn btn-primary"
-                                                                @click="updateAdministratorById()">修改
+                                                        <button type="button" class="btn btn-success col-12"
+                                                                data-dismiss="modal" @click="addNewPermission()">确认
                                                         </button>
                                                     </div>
                                                 </div>
@@ -412,11 +437,11 @@
                                                 <div style="">
                                                     <!-- /.card-body -->
                                                     <div class="card-footer">
-                                                        <button type="button" class="btn btn-default col-5"
+                                                        <button type="button" class="btn btn-default"
                                                                 data-dismiss="modal">取消
                                                         </button>
-                                                        <button type="button" class="btn btn-danger col-5"
-                                                                @click="deleteAdministratorById()">删除
+                                                        <button type="button" class="btn btn-danger"
+                                                                @click="deleteRoleById()">删除
                                                         </button>
                                                     </div>
                                                 </div>
@@ -424,6 +449,49 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="modal fade" id="addRoleModal"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <h4 class="modal-title"></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="">
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label for="roleName">名称</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="roleName"
+                                                                   v-model="aNewRole.name">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="aNewRoleDesc">说明</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="aNewRoleDesc"
+                                                                   v-model="aNewRole.desc">
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <button type="button" class="btn btn-default col-5"
+                                                                data-dismiss="modal">取消
+                                                        </button>
+                                                        <button type="button" class="btn btn-success col-5"
+                                                                @click="addNewRole()">添加
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -448,6 +516,7 @@
         </div>
     </footer>
 
+
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
         <!-- Control sidebar content goes here -->
@@ -468,103 +537,96 @@
 <script src="../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../dist/js/demo.js"></script>
+
 <script>
     var data = {
-        pageInfo: {
-            endRow: 8,
-            firstPage: 1,
-            hasNextPage: true,
-            hasPreviousPage: false,
-            isFirstPage: true,
-            isLastPage: false,
-            lastPage: 8,
-            list: [],
-            navigateFirstPage: 1,
-            navigateLastPage: 8,
-            navigatePages: 8,
-            navigatepageNums: [],
-            nextPage: 2,
-            pageNum: 1,
-            pageSize: 10,
-            pages: 12,
-            prePage: 0,
-            size: 8,
-            total: -1,
+        roles: [],
+        deletedId: -1,
+        deletedPermissionId: -1,
+        theRole: {
+            role: {},
+            permissions: {}
         },
-        theAdministrator: {},
-        deletedAdministratorId: -1
+        aNewPermission: "",
+        aNewRole: {}
     };
-    var retrieveAdministratorByPageAndPageSize = function (page, pageSize) {
-        axios.get("/administrator/listSearch?page=" + page + "&pageSize=" + pageSize)
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
-    }
     var methods = {
-        queryAdministratorById: function (id) {
-            axios.get("/administrator/queryById/" + id)
+        setDeletedId: function (id) {
+            this.deletedId = id;
+        },
+        deleteRoleById: function () {
+            axios.delete("/role/deleteById/" + this.deletedId)
                 .then(function (response) {
                     if (response.data.code === 200) {
-                        this.app.theAdministrator = response.data.data;
+                        alert("删除成功！");
+                        $("#deleteModal").modal("hide");
+                        mounted();
                     }
                 }).catch(function (err) {
                 console.log(err);
             })
         },
-        updateAdministratorById: function () {
-            axios.post("/administrator/updateAdministratorById", {
-                id: this.theAdministrator.id,
-                username: this.theAdministrator.username,
-                role: this.theAdministrator.role,
-                avatar: this.theAdministrator.avatar
+        deletePermissionById: function () {
+            axios.delete("/permission/deleteById/" + this.deletedPermissionId)
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        alert("删除成功！");
+                        $("#deletePermissionModal").modal("hide");
+                        this.app.queryRoleById(this.app.theRole.role.id);
+                    }
+                }).catch(function (err) {
+                console.log(err);
+            })
+        },
+        queryRoleById: function (id) {
+            axios.get("/role/queryById/" + id).then(function (response) {
+                if (response.data.code === 200) {
+                    this.app.theRole = response.data.data;
+                }
+            }).catch(function (err) {
+                console.log(err);
+            })
+        },
+        addNewPermission: function () {
+            axios.post("/permission/add", {
+                roleId: this.theRole.role.id,
+                permission: this.aNewPermission
+            }).then(function (response) {
+                alert("添加成功！");
+                this.app.queryRoleById(this.app.theRole.role.id);
+            })
+        },
+        addNewRole: function () {
+            axios.post("/role/add", {
+                name: this.aNewRole.name,
+                desc: this.aNewRole.desc
             }).then(function (response) {
                 if (response.data.code === 200) {
-                    alert("修改成功！");
-                    $("#myModal").modal("hide");
-                    retrieveAdministratorByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
+                    alert("添加成功！");
+                    $("#addRoleModal").modal("hide");
+                    mounted();
                 }
-            })
-        },
-        setDeletedAdministratorId: function (id) {
-            this.deletedAdministratorId = id;
-        },
-        deleteAdministratorById: function () {
-            axios.delete("/administrator/deleteById/" + this.deletedAdministratorId)
-                .then(function (response) {
-                    if (response.data.code === 200) {
-                        alert("删除一个管理员成功！");
-                        $("#deleteModal").modal("hide");
-                        retrieveAdministratorByPageAndPageSize(this.app.pageInfo.pageNum, this.app.pageInfo.pageSize);
-                    }
-                }).catch(function (err) {
+            }).catch(function (err) {
                 console.log(err);
-            });
+            })
         }
-
     };
     var mounted = function () {
-        axios.get("/administrator/listSearch?page=1&pageSize=" + this.pageInfo.pageSize)
+        axios.get("/role/listSearchAll")
             .then(function (response) {
                 if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
+                    this.app.roles = response.data.data;
                 }
             }).catch(function (err) {
             console.log(err);
         })
     }
-
-
     var app = new Vue({
         el: "#app",
         data: data,
         methods: methods,
         mounted: mounted
-    })
-
+    });
 </script>
 </body>
 </html>

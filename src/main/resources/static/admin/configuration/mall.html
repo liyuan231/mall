@@ -10,12 +10,14 @@
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-    <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <script src="../dist/js/axios.js"></script>
+    <script src="../dist/js/vue.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -63,7 +65,8 @@
     <aside class="main-sidebar sidebar-collapse sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="" class="brand-link">
-            <img src="../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <img src="../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                 style="opacity: .8">
             <span class="brand-text font-weight-light">MALL</span>
         </a>
         <!-- Sidebar -->
@@ -79,7 +82,8 @@
             </div>
             <!-- Sidebar Menu -->
             <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                    data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                     <li class="nav-item">
@@ -199,7 +203,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="" class="nav-link">
+                                <a href="../system/role.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>角色管理</p>
                                 </a>
@@ -247,7 +251,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="app">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -275,37 +279,14 @@
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body">
-                                <table id="example1" class="table table-bordered table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>此处要获取所有的用户信息</td>
-                                        <td>Internet
-                                            Explorer 4.0
-                                        </td>
-                                        <td>Win 95+</td>
-                                        <td> 4</td>
-                                        <td>X</td>
-                                    </tr>
-                                    </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
-                                    </tr>
-                                    </tfoot>
-                                </table>
+                                <div class="form-group row" v-for="(item,index) of systems" :key="item.id">
+                                    <label :for="item.key" class="col-2">{{item.key}}</label>
+                                    <input :id="item.key" class="form-control col-10"
+                                           @change="modifiedSystemIds.add(index)" v-model="systems[index].value"/>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-success col-12" @click="modifySystem()">修改</button>
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -322,7 +303,13 @@
     <!--  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
     <!--  以下均为一致，仅需微调即可使用-->
     <!-- /.content-wrapper -->
-    <div id="footer"></div>
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+        All rights reserved.
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> v1.0.0
+        </div>
+    </footer>
 
 
     <!-- Control Sidebar -->
@@ -333,49 +320,62 @@
 </div>
 <!-- ./wrapper -->
 
-<!-- jQuery -->
 <script src="../plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
 <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 <script src="../plugins/jszip/jszip.min.js"></script>
 <script src="../plugins/pdfmake/pdfmake.min.js"></script>
 <script src="../plugins/pdfmake/vfs_fonts.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-<!-- AdminLTE App -->
 <script src="../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../dist/js/demo.js"></script>
 <!-- Page specific script -->
+
 <script>
-    $(function () {
-        $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-        $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-        });
+    data = {
+        systems: [],
+        modifiedSystemIds: new Set()
+    };
+    methods = {
+        modifySystem: function () {
+            var newSystems = [];
+            for (var i of this.modifiedSystemIds) {
+                newSystems.push({
+                    id: this.systems[i].id,
+                    value: this.systems[i].value
+                });
+            }
+            if (newSystems.length === 0) {
+                return;
+            }
+            axios.post("/system/batchUpdate", newSystems)
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        alert("更新商城配置成功！")
+                        mounted();
+                    }
+                }).catch(function (err) {
+                console.log(err);
+            })
+        }
+    };
+    mounted = function () {
+        axios.get("/system/listAll")
+            .then(function (response) {
+                if (response.data.code === 200) {
+                    this.app.systems = response.data.data;
+
+                }
+            }).catch(function (err) {
+            console.log(err);
+        })
+    };
+
+    var app = new Vue({
+        el: "#app",
+        data: data,
+        methods: methods,
+        mounted: mounted
     });
-</script>
-<script type="text/javascript">
-    // $("#nav").load('component/nav.html');
-    // $("#aside").load('component/aside.html');
-    $("#footer").load('component/footer.html');
 </script>
 </body>
 </html>

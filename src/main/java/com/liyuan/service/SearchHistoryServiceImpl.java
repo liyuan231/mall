@@ -8,6 +8,7 @@ import com.liyuan.model.MallSearchHistoryExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +27,7 @@ public class SearchHistoryServiceImpl {
     }
 
     public int insertSelective(MallSearchHistory searchHistory) {
+        searchHistory.setUpdateTime(LocalDateTime.now());
         return searchHistoryMapper.insertSelective(searchHistory);
     }
 }

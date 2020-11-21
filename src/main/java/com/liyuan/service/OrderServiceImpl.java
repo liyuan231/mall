@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class OrderServiceImpl {
 
 
     public int insertSelective(MallOrder order) {
+        order.setUpdateTime(LocalDateTime.now());
         return orderMapper.insertSelective(order);
     }
 

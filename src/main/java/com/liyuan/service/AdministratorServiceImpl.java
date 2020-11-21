@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +29,7 @@ public class AdministratorServiceImpl {
     }
 
     public int insertSelective(MallAdmin admin) {
+        admin.setCreateTime(LocalDateTime.now());
         return adminMapper.insertSelective(admin);
     }
 

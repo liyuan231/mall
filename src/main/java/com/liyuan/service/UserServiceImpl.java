@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserDetailsService {
 
     public int insertSelective(MallUser user) {
         MallUser mallUser = queryByUsername(user.getUsername());
+        user.setUpdateTime(LocalDateTime.now());
         Assert.isNull(mallUser, "用户名已存在！");
         return userMapper.insertSelective(user);
     }

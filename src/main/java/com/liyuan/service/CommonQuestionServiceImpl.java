@@ -35,6 +35,7 @@ public class CommonQuestionServiceImpl {
     }
 
     public int insertSelective(MallIssue mallIssue) {
+        mallIssue.setUpdateTime(LocalDateTime.now());
         return issueMapper.insertSelective(mallIssue);
     }
 

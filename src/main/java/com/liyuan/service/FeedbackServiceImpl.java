@@ -8,6 +8,7 @@ import com.liyuan.model.MallFeedbackExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +27,7 @@ public class FeedbackServiceImpl {
     }
 
     public int insertSelective(MallFeedback mallFeedback) {
+        mallFeedback.setUpdateTime(LocalDateTime.now());
         return feedbackMapper.insertSelective(mallFeedback);
     }
 

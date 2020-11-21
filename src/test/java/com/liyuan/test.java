@@ -182,4 +182,26 @@ public class test {
             administratorService.insertSelective(admin);
         }
     }
+
+    @Autowired
+    private StorageServiceImpl storageService;
+
+    @Test
+    public void insertStorage() {
+
+        PageInfo pageInfo = userService.querySelective(1, 100, MallUser.Column.id);
+        List<MallUser> users = pageInfo.getList();
+        List<Integer> userIds = new LinkedList<>();
+        for (MallUser user : users) {
+            userIds.add(user.getId());
+        }
+        for (int i = 0; i < 45; i++) {
+            MallStorage mallStorage = new MallStorage();
+            mallStorage.setLocation("location" + i);
+            mallStorage.setType(i);
+            mallStorage.setUserId(userIds.get((int) (Math.random() * userIds.size())));
+            mallStorage.setUpdateTime(LocalDateTime.now());
+            storageService.insertSelective(mallStorage);
+        }
+    }
 }
