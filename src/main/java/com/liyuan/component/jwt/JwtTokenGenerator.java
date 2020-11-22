@@ -54,7 +54,7 @@ public class JwtTokenGenerator {
         return jwt.getClaims();
     }
 
-    public JwtTokenPair jwtTokenPairWithUsername(String username) {
-        return jwtTokenPair(username, null, null);
+    public JwtTokenPair jwtTokenPairWithUsername(String username, Set<String> roles, Map<String, String> additional) {
+        return jwtTokenPair(username, roles, additional);
     }
 }

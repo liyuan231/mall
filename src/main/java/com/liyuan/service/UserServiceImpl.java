@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username,MallUser.Column.password);
+        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.password);
         AssertUtils.mallUserNotNull(mallUser);
         return new User(username, mallUser.getPassword(), AuthorityUtils.NO_AUTHORITIES);
     }
@@ -56,8 +56,8 @@ public class UserServiceImpl implements UserDetailsService {
 
     public int insertSelective(MallUser user) {
         MallUser mallUser = queryByUsername(user.getUsername());
-        user.setUpdateTime(LocalDateTime.now());
         Assert.isNull(mallUser, "用户名已存在！");
+        user.setUpdateTime(LocalDateTime.now());
         return userMapper.insertSelective(user);
     }
 
@@ -67,6 +67,7 @@ public class UserServiceImpl implements UserDetailsService {
 
     public PageInfo querySelective(String keyWord, Integer page, Integer pageSize, MallUser.Column... columns) {
         MallUserExample mallUserExample = new MallUserExample();
+        mallUserExample.setOrderByClause("id desc");
         MallUserExample.Criteria criteria = mallUserExample.createCriteria();
         criteria.andUsernameLike("%" + keyWord + "%");
         PageHelper.startPage(page, pageSize);

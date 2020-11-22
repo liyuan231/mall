@@ -25,6 +25,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
 
 @EnableConfigurationProperties({JwtProperties.class})
 @ConditionalOnProperty(prefix = "jwt.config", name = "enabled", matchIfMissing = true, havingValue = "true")
@@ -55,7 +57,9 @@ public class JwtConfiguration {
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 //                MallUser mallUser = userService.queryByUsername(userDetails.getUsername(), MallUser.Column.id, MallUser.Column.role);
                 //我觉得还是将该用户的role放置在token里比较好，或者干脆只放置用户名，
-                JwtTokenPair jwtTokenPair = jwtTokenGenerator.jwtTokenPairWithUsername(userDetails.getUsername());
+                Map<String, String> additional = new HashMap<>();
+                additional.put("ip", request.getRemoteAddr());
+                JwtTokenPair jwtTokenPair = jwtTokenGenerator.jwtTokenPairWithUsername(userDetails.getUsername(), null, additional);
                 String build = ResponseUtils.build(HttpStatus.OK.value(), "登录成功！", jwtTokenPair);
                 ResponseUtils.printJson(response, build);
             }
@@ -67,7 +71,7 @@ public class JwtConfiguration {
         return new AuthenticationFailureHandler() {
             @Override
             public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                String build = ResponseUtils.build(HttpStatus.OK.value(), "用户名或密码错误！");
+                String build = ResponseUtils.build(HttpStatus.BAD_REQUEST.value(), "用户名或密码错误！");
                 ResponseUtils.printJson(response, build);
             }
         };

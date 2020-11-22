@@ -17,7 +17,7 @@ public class SpringMvcConfiguration implements WebMvcConfigurer {
 //    private String webPath;
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //        registry.addResourceHandler(new String[]{this.springFilePath + "**"}).addResourceLocations(new String[]{"file:" + this.filePath}).setCachePeriod(31556926);
-        registry.addResourceHandler("/admin/**").addResourceLocations("classpath:/static/admin/").resourceChain(true)
+        registry.addResourceHandler("/admin/**").addResourceLocations("classpath:/static/views/").resourceChain(true)
         .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
     }
 

@@ -1,0 +1,139 @@
+<html lang="en" style="background-image: url('./images/bg.jpg');background-repeat: no-repeat;">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AdminLTE 3 | Log in (v2)</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <script src="../dist/js/vue.js"></script>
+    <script src="../dist/js/axios.js"></script>
+
+    <style>
+        #loginForm {
+            border: 1px solid black;
+            border-radius: 3px;
+            margin: 0 auto;
+            margin-top: 120px;
+            width: 500px;
+            height: 500px;
+            background-color: rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0 0.1rem #c2c2c2;
+        }
+
+        .form-group {
+            padding: 0 60px;
+            width: 100%;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 45px;
+        }
+
+        .text-danger {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="" style="min-height: 466px;background-color: transparent">
+<div id="app">
+    <div id="loginForm">
+        <div class="card-header" style="margin-bottom: 30px;">
+            <h2 class="card-title" style="font-size: 30px;">MALL</h2>
+            <span style="vertical-align: bottom">注册</span>
+        </div>
+        <div class="form">
+            <div class="form-group">
+                <label for="exampleInputEmail1">用户名</label>
+
+                <span class="text-danger" v-if="username.trim()===''">用户名不应为空</span>
+                <input v-model.trim="username" type="email" class="form-control" id="exampleInputEmail1" name="username"
+                       placeholder="邮箱">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input v-model.trim="password" type="password" class="form-control" id="exampleInputPassword1"
+                       name="password" placeholder="密码">
+            </div>
+            <div class="form-group">
+                <label for="passwordAgain">再次输入密码</label>
+                <span class="text-danger" v-if="password!==passwordAgain">两次输入密码不一致</span>
+                <input v-model.trim="passwordAgain" type="password" class="form-control" id="passwordAgain"
+                       name="password"
+                       placeholder="请再次输入密码">
+                <span class="text-danger" v-if="password.length<6">密码长度应大于6位数</span>
+                <span class="text-danger" v-if="usernameAlreadyExist">用户名已存在</span>
+            </div>
+
+            <div class="form-group clearfix">
+                <button @click="register()" type="button" style="float: left"
+                        class="left col-5 form-control btn btn-success">注册
+                </button>
+                <a href="./login.html">
+                    <button type="button" style="float: right" class="right col-5 form-control btn btn-primary">登录
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../dist/js/adminlte.min.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            username: "",
+            password: "",
+            passwordAgain: "",
+            usernameAlreadyExist: false,
+        },
+        methods: {
+            register: function () {
+                if (this.username === "") {
+                    return;
+                }
+                if (this.password !== this.passwordAgain) {
+                    return;
+                }
+                if (this.password.length < 6) {
+                    return;
+                }
+                console.log("开始注册！");
+                axios.post("/client/user/register", {
+                    username: this.username,
+                    password: this.password
+                }).then(function (response) {
+                    console.log(response);
+                    if (response.data.code === 200) {
+                        alert("注册成功！即将跳转到登录界面！");
+                        window.location.href = "/views/client/login.html";
+                        return;
+                    }
+                    console.log("注册失败！");
+                    this.app.usernameAlreadyExist = true;
+                }).catch(function (err) {
+                    console.log(err);
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>

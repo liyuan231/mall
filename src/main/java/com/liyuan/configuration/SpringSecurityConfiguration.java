@@ -1,5 +1,6 @@
 package com.liyuan.configuration;
 
+import com.liyuan.component.security.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(
@@ -41,16 +44,18 @@ public class SpringSecurityConfiguration {
         @Autowired
         @Qualifier("userServiceImpl")
         private UserDetailsService userService;
-        //    @Autowired
-//    private AuthenticationFailureHandler authenticationFailureHandler;
+        @Autowired
+        private AuthenticationFailureHandler authenticationFailureHandler;
         @Autowired
         private AuthenticationSuccessHandler authenticationSuccessHandler;
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
+            http.addFilterAt(new JsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             http.csrf().disable().
                     antMatcher("/client/**").formLogin().loginProcessingUrl("/client/login")
                     .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler)
                     .and().authorizeRequests().anyRequest().permitAll();
             http.userDetailsService(userService);
         }
@@ -61,8 +66,8 @@ public class SpringSecurityConfiguration {
         @Autowired
         @Qualifier("administratorServiceImpl")
         private UserDetailsService userService;
-        //    @Autowired
-//    private AuthenticationFailureHandler authenticationFailureHandler;
+        @Autowired
+        private AuthenticationFailureHandler authenticationFailureHandler;
         @Autowired
         private AuthenticationSuccessHandler authenticationSuccessHandler;
 
@@ -72,6 +77,7 @@ public class SpringSecurityConfiguration {
                     antMatcher("/admin/**").
                     formLogin().loginProcessingUrl("/admin/login")
                     .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler)
                     .and().authorizeRequests().anyRequest().permitAll();
             http.userDetailsService(userService);
         }
