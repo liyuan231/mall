@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Log in (v2)</title>
+    <title>login</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -110,13 +110,15 @@
                     password: this.password
                 }, {
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                        // 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                     },
                 }).then(function (response) {
                     console.log(response);
                     if (response.data.code === 200) {
-                        window.location.href = "/views/client/index.html";
+                        setTimeout(function () {
+                            window.location.href = "/views/client/index.html";
+                        }, 10)
                         return;
                     }
                     this.app.error = true;

@@ -25,8 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         securedEnabled = true
 )
 public class SpringSecurityConfiguration {
-    @Bean
 
+    @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -49,16 +49,25 @@ public class SpringSecurityConfiguration {
         @Autowired
         private AuthenticationSuccessHandler authenticationSuccessHandler;
 
+        @Bean
+        public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() throws Exception {
+            JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter();
+            filter.setAuthenticationManager(authenticationManagerBean());
+            filter.setFilterProcessesUrl("/client/login");
+            filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+            filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+            return filter;
+        }
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.addFilterAt(new JsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            http.addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             http.csrf().disable().
-                    antMatcher("/client/**").formLogin().loginProcessingUrl("/client/login")
-                    .successHandler(authenticationSuccessHandler)
-                    .failureHandler(authenticationFailureHandler)
+                    antMatcher("/client/**").formLogin()
                     .and().authorizeRequests().anyRequest().permitAll();
             http.userDetailsService(userService);
         }
+
     }
 
     @Configuration
