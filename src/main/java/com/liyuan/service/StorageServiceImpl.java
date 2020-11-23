@@ -28,4 +28,12 @@ public class StorageServiceImpl {
         mallStorage.setUpdateTime(LocalDateTime.now());
         return storageMapper.insertSelective(mallStorage);
     }
+
+    public MallStorage queryOneByUserIdAndType(Integer userId, int type, MallStorage.Column... columns) {
+        MallStorageExample storageExample = new MallStorageExample();
+        MallStorageExample.Criteria criteria = storageExample.createCriteria();
+        criteria.andUserIdEqualTo(userId);
+        criteria.andTypeEqualTo(type);
+        return storageMapper.selectOneByExampleSelective(storageExample, columns);
+    }
 }

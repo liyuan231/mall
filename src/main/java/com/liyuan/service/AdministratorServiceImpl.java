@@ -5,7 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.liyuan.dao.MallAdminMapper;
 import com.liyuan.model.MallAdmin;
 import com.liyuan.model.MallAdminExample;
+import com.liyuan.model.MallRole;
 import com.liyuan.utils.AssertUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,8 @@ import java.util.List;
 public class AdministratorServiceImpl implements UserDetailsService {
     @Resource
     private MallAdminMapper adminMapper;
+    @Autowired
+    private RoleServiceImpl roleService;
 
     public PageInfo listSearch(String keyword, Integer page, Integer pageSize, MallAdmin.Column... columns) {
         MallAdminExample mallAdminExample = new MallAdminExample();
@@ -54,7 +58,8 @@ public class AdministratorServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         MallAdmin admin = queryByUsername(username);
         AssertUtils.adminUserNotNull(admin);
-        return new User(username, admin.getPassword(), AuthorityUtils.NO_AUTHORITIES);
+        MallRole role = roleService.queryById(admin.getRole());
+        return new User(username, admin.getPassword(), AuthorityUtils.createAuthorityList(role.getName()));
     }
 
     private MallAdmin queryByUsername(String username) {

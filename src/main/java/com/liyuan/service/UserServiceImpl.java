@@ -3,6 +3,7 @@ package com.liyuan.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.liyuan.dao.MallUserMapper;
+import com.liyuan.model.MallRole;
 import com.liyuan.model.MallUser;
 import com.liyuan.model.MallUserExample;
 import com.liyuan.utils.AssertUtils;
@@ -37,9 +38,10 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.password);
+        MallUser mallUser = this.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.password, MallUser.Column.role);
         AssertUtils.mallUserNotNull(mallUser);
-        return new User(username, mallUser.getPassword(), AuthorityUtils.NO_AUTHORITIES);
+        MallRole role = roleService.queryById(mallUser.getRole());
+        return new User(username, mallUser.getPassword(), AuthorityUtils.createAuthorityList(role.getName()));
     }
 
 

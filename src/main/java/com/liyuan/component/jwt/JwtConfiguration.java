@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -25,8 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @EnableConfigurationProperties({JwtProperties.class})
 @ConditionalOnProperty(prefix = "jwt.config", name = "enabled", matchIfMissing = true, havingValue = "true")
@@ -59,7 +59,12 @@ public class JwtConfiguration {
                 //我觉得还是将该用户的role放置在token里比较好，或者干脆只放置用户名，
                 Map<String, String> additional = new HashMap<>();
                 additional.put("ip", request.getRemoteAddr());
-                JwtTokenPair jwtTokenPair = jwtTokenGenerator.jwtTokenPairWithUsername(userDetails.getUsername(), null, additional);
+                Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+                Set<String> roles = new HashSet<>();
+                for (GrantedAuthority authority : authorities) {
+                    roles.add(authority.getAuthority());
+                }
+                JwtTokenPair jwtTokenPair = jwtTokenGenerator.jwtTokenPairWithUsername(userDetails.getUsername(), roles, additional);
                 String build = ResponseUtils.build(HttpStatus.OK.value(), "登录成功！", jwtTokenPair);
                 ResponseUtils.printJson(response, build);
             }

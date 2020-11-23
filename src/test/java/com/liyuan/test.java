@@ -204,4 +204,22 @@ public class test {
             storageService.insertSelective(mallStorage);
         }
     }
+
+    @Autowired
+    GoodsServiceImpl goodsService;
+
+    @Test
+    public void insertGoods() {
+        for (int i = 0; i < 56; i++) {
+            MallGoods mallGoods = new MallGoods();
+            mallGoods.setName("商品" + i);
+            mallGoods.setPrice((float) (Math.random() * 200.0));
+            mallGoods.setBrief("商品简要描述" + i);
+            mallGoods.setDetail("商品富文本的详细描述" + i);
+            mallGoods.setUpdateTime(LocalDateTime.now());
+            mallGoods.setCategoryId((int) (Math.random() * 6));
+            mallGoods.setKeywords("关键字" + i);
+            goodsService.insertSelective(mallGoods);
+        }
+    }
 }

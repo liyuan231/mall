@@ -16,9 +16,9 @@ public class GoodsServiceImpl {
     private MallGoodsMapper goodsMapper;
 
 
-    public PageInfo querySelective(String keyword, Integer page, Integer pageSize, MallGoods.Column... columns) {
+    public PageInfo querySelective(String keyword, Integer page, Integer pageSize, String sort, String order, MallGoods.Column... columns) {
         MallGoodsExample goodsExample = new MallGoodsExample();
-        goodsExample.setOrderByClause("update_time desc");
+        goodsExample.setOrderByClause(sort + " " + order);
         MallGoodsExample.Criteria criteria = goodsExample.createCriteria();
         criteria.andNameLike("%" + keyword + "%");
         PageHelper.startPage(page, pageSize);
@@ -26,4 +26,7 @@ public class GoodsServiceImpl {
         return new PageInfo(mallGoods);
     }
 
+    public int insertSelective(MallGoods mallGoods) {
+        return goodsMapper.insertSelective(mallGoods);
+    }
 }

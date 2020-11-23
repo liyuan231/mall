@@ -50,6 +50,61 @@
             background-color: rgba(0, 0, 0, 0.2);
             cursor: pointer;
         }
+
+        .lastest {
+            background-color: #fff;
+        }
+
+        .image {
+            width: 140px;
+            height: 140px;
+        }
+
+        .itemImage {
+            float: left;
+            list-style: none;
+            width: 30%;
+            margin: 1%;
+        }
+
+        ul.clearfix {
+            padding: 0px;
+        }
+
+        .goodsImage {
+
+        }
+
+        .itemImage .itemImageDesc .name {
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            color: rgb(123, 116, 116);
+        }
+
+        .itemImage .itemImageDesc .price {
+            margin-bottom: 4px;
+        }
+
+        .newGoodsTitle {
+            margin: 5px;
+            color: rgb(123, 116, 116);
+        }
+
+        .newGoodsTitle .more:hover {
+            color: rgba(0, 0, 0, 0.7);
+            cursor: pointer;
+        }
+
+        .newGoodsTitle .more:active {
+            color: rgba(0, 0, 0, 1);
+        }
+
+        .main-footer {
+            text-align: center;
+            background-color: #fff;
+            margin: 20px 0 0 0;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -138,23 +193,62 @@
             </ul>
         </div>
         <div class="lastest row">
-
+            <div class="newGoodsTitle">
+                <span class="more" style="float: right;display: inline-block;padding:2px;">更多最新商品 ></span>
+                <h3 class="title">最新上架</h3>
+            </div>
+            <ul class="clearfix">
+                <li v-for="item of newGoods" class="itemImage">
+                    <img src="./images/bg.jpg" alt=""
+                         class="img-responsive img-rounded goodsImage">
+                    <div class="itemImageDesc">
+                        <p class="name">{{item.goods.name}}</p>
+                        <p class="price">{{item.goods.price}}</p>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 
-
+<footer class="main-footer">
+    <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+        <b>Version</b> v1.0.0
+    </div>
+</footer>
 </body>
 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
 <script src="./js/jquery.min.js"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="./js/bootstrap.min.js"></script>
 <script>
+    var retrieveUserByToken = function () {
+        axios.get("/common/retrieveUserByToken", {
+            headers: {
+                Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            }).catch(function (err) {
+            console.log(err);
+        })
+    }
+
 
     var app = new Vue({
         el: "#app",
         data: {
-            categories: []
+            categories: [],
+            newGoods: [
+                {
+                    storage: {
+                        location: ""
+                    }, goods: {}
+                }
+            ]
         },
         methods: {},
         mounted: function () {
@@ -162,14 +256,29 @@
                 .then(function (response) {
                     console.log(response.data);
                     if (response.data.code === 200) {
-                        console.log(response.data);
                         this.app.categories = response.data.data;
                     }
                 }).catch(function (err) {
                 console.log(err);
+            });
+            axios.get("/client/goods/listSearch?page=1&pageSize=12", {
+                headers: {
+                    Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+                }
             })
-        }
+                .then(function (response) {
+                    if (response.data.code === 200) {
+                        this.app.newGoods = response.data.data.list;
+                    }
+                    console.log(response);
+                })
+                .catch(function (err) {
+                    console.log(err);
+                })
+            retrieveUserByToken();
+        },
     });
+
 </script>
 
 </html>

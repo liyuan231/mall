@@ -105,7 +105,6 @@
                 console.log(this.username);
                 console.log("执行登录！");
                 axios.post("/client/login", {
-
                     username: this.username,
                     password: this.password
                 }, {
@@ -114,15 +113,16 @@
                         // 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
                     },
                 }).then(function (response) {
-                    console.log(response);
                     if (response.data.code === 200) {
+                        localStorage.setItem("accessToken", response.data.data.accessToken);
+                        localStorage.setItem("refreshToken", response.data.data.accessToken);
                         setTimeout(function () {
+                            // alert(1)
                             window.location.href = "/views/client/index.html";
-                        }, 10)
+                        }, 100)
                         return;
                     }
                     this.app.error = true;
-
                 }).catch(function (err) {
                     console.log(err);
                 })

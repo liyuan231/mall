@@ -2,10 +2,11 @@ package com.liyuan.component.security;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.liyuan.component.jwt.JwtTokenGenerator;
 import com.liyuan.exception.JwtTokenMissingAuthenticationException;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -29,6 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHENTICATION_PREFIX = "Bearer ";
     private static final String AUTHORIZATION = "Authorization";
     private AuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private JwtTokenGenerator jwtTokenGenerator;
 
 
     //依赖注入优先
@@ -60,16 +65,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolve(String jwt, HttpServletRequest httpServletRequest) {
-        JSONObject jsonObject = null;
+        String json = jwtTokenGenerator.decodeAndVerify(jwt);
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+        LocalDateTime expirationDatetime = LocalDateTime.parse((String) jsonObject.get("expiration"));
+        if (LocalDateTime.now().isAfter(expirationDatetime)) {
+            throw new AuthenticationServiceException("token 过期！");
+        }
         //此处解析该token
         JSONArray roles = jsonObject.getJSONArray("roles");
         Collection<GrantedAuthority> authorities = new LinkedList<>();
         for (Object role : roles) {
-            String next = null;
+            String next = (String) role;
             authorities.add(new SimpleGrantedAuthority("ROLE_" + next));
             //TODO 获取该用户所拥有的权限
         }
-        String username = jsonObject.getString("username");
+        String username = jsonObject.getString("audience");
         User user = new User(username, "[PASSWORD]", authorities);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
