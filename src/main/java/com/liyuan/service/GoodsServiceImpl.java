@@ -26,7 +26,15 @@ public class GoodsServiceImpl {
         return new PageInfo(mallGoods);
     }
 
+    public PageInfo querySelective(Integer page, Integer pageSize, String sort, String order, MallGoods.Column... columns) {
+        return querySelective("", page, pageSize, sort, order, columns);
+    }
+
     public int insertSelective(MallGoods mallGoods) {
         return goodsMapper.insertSelective(mallGoods);
+    }
+
+    public MallGoods queryById(Integer goodsId, MallGoods.Column... columns) {
+        return goodsMapper.selectByPrimaryKeySelective(goodsId, columns);
     }
 }

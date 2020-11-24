@@ -41,7 +41,7 @@ public class OrderController {
             OrderAndUserAndAddress orderAndUserAndAddress = new OrderAndUserAndAddress();
             orderAndUserAndAddress.setOrder(order);
             MallAddress mallAddress = addressService.queryById(order.getAddressId());
-            orderAndUserAndAddress.setAddress(mallAddress);
+            orderAndUserAndAddress.setAddress(mallAddress == null ? new MallAddress() : mallAddress);
             MallUser mallUser = userService.queryById(order.getUserId(), MallUser.Column.id, MallUser.Column.username);
             orderAndUserAndAddress.setUser(mallUser);
             orderAndUserAndAddresses.add(orderAndUserAndAddress);

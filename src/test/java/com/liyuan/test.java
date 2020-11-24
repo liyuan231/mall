@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 @SpringBootTest(classes = {Application.class})
 @RunWith(SpringRunner.class)
@@ -224,4 +223,34 @@ public class test {
         }
     }
 
+
+    @Autowired
+    private CartServiceImpl cartService;
+
+    @Test
+    public void insertFakeCart() {
+        PageInfo pageInfo = userService.querySelective(1, 100, MallUser.Column.id);
+        List<MallUser> users = pageInfo.getList();
+        List<Integer> userIds = new LinkedList<>();
+        for (MallUser user : users) {
+            userIds.add(user.getId());
+        }
+        PageInfo goodsList = goodsService.querySelective(1, 100, "update_time", "desc", MallGoods.Column.id);
+        List<MallGoods> goods = goodsList.getList();
+        List<Integer> goodsIds = new LinkedList<>();
+        for (MallGoods good : goods) {
+            goodsIds.add(good.getId());
+        }
+        for (int i = 0; i < 56; i++) {
+            Integer userId = userIds.get((int) (Math.random() * userIds.size()));
+            Integer goodsId = goodsIds.get((int) (Math.random() * goodsIds.size()));
+            MallCart cart = new MallCart();
+            cart.setChecked(false);
+            cart.setUserId(userId);
+            cart.setGoodsId(goodsId);
+            cart.setNumber(i);
+            cart.setProductId(-1);
+            cartService.insertSelective(cart);
+        }
+    }
 }
