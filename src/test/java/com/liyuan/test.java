@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest(classes = {Application.class})
 @RunWith(SpringRunner.class)
@@ -222,4 +223,5 @@ public class test {
             goodsService.insertSelective(mallGoods);
         }
     }
+
 }
