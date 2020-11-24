@@ -1,8 +1,8 @@
 package com.liyuan.utils;
 
 public enum FileEnum {
-    GOODS_PRIMARY_IMAGE(10);
-
+    GOODS_PRIMARY_IMAGE(10),
+    AVATAR(1);
 
     FileEnum(int type) {
         this.value = type;

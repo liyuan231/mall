@@ -85,4 +85,11 @@ public class UserServiceImpl implements UserDetailsService {
     public void deleteById(Integer id) {
         userMapper.deleteByPrimaryKey(id);
     }
+
+    public int updateSelectiveByUsername(MallUser mallUser) {
+        MallUserExample userExample = new MallUserExample();
+        MallUserExample.Criteria criteria = userExample.createCriteria();
+        criteria.andUsernameEqualTo(mallUser.getUsername());
+        return userMapper.updateByExampleSelective(mallUser, userExample);
+    }
 }

@@ -9,6 +9,7 @@ public class COSProperties {
     private String bucketName;
     private String regionName;
     private String appId;
+    private String baseUrl;
 
     @Override
     public String toString() {
@@ -19,6 +20,14 @@ public class COSProperties {
                 ", regionName='" + regionName + '\'' +
                 ", appId='" + appId + '\'' +
                 '}';
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String getSecretId() {

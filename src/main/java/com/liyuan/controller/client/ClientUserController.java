@@ -27,13 +27,5 @@ public class ClientUserController {
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("/retrieveUserAddressesByToken")
-    @PreAuthorize("hasRole('USER')")
-    public Object retrieveUserAddressesByToken() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = user.getUsername();
-        MallUser mallUser = userService.queryByUsername(username, MallUser.Column.id);
-        List<MallAddress> mallAddresses = addressService.queryByUserId(mallUser.getId());
-        return ResponseUtils.build(HttpStatus.OK.value(), "获取用户地址信息成功！", mallAddresses);
-    }
+
 }

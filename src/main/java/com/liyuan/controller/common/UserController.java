@@ -1,5 +1,6 @@
 package com.liyuan.controller.common;
 
+import com.liyuan.component.cos.COSProperties;
 import com.liyuan.model.MallUser;
 import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
@@ -19,6 +20,8 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private COSProperties cosProperties;
 
 
     @GetMapping("/retrieveUserByToken")
@@ -28,6 +31,7 @@ public class UserController {
         User user = (User) authentication.getPrincipal();
         String username = user.getUsername();
         MallUser mallUser = userService.queryByUsername(username, MallUser.Column.id, MallUser.Column.username, MallUser.Column.mobile, MallUser.Column.avatar, MallUser.Column.role);
+        mallUser.setAvatar(cosProperties.getBaseUrl() + mallUser.getAvatar());
         return ResponseUtils.build(HttpStatus.OK.value(), "获取用户信息成功！", mallUser);
     }
 

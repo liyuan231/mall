@@ -34,6 +34,10 @@
             border-radius: 4px;
             margin-bottom: 30px;
         }
+
+        .addresses {
+            margin: 60px 10px;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +100,7 @@
                 <label>头像</label>
                 <!--                <form action="/common/upload" method="post">-->
                 <div class="avatar">
-                    <img src="./images/bg.jpg" alt="" class="img-thumbnail" style="width: 140px;height: 140px;">
+                    <img :src="currentUser.avatar" alt="" class="img-thumbnail" style="width: 140px;height: 140px;">
                     <input multiple @change="uploadAvatar" class="btn"
                            style="width: 140px;height: 140px;display: inline-block;border-radius: 4px;border:1px solid black;"
                            type="file"/>
@@ -107,24 +111,72 @@
                 <!--                </form>-->
             </div>
         </div>
-
         <div class="form userAddresses">
             <h4 class="title">收货地址</h4>
-            <div class="addresses" v-for="(address,index) of addresses">
+            <button type="button" class="btn btn-success" style="float:right;" data-target="#addAddressModel"
+                    data-toggle="modal">添加收货地址
+            </button>
+            <div class="addresses" v-for="(address,index) of addresses" :key="address.id">
                 <label>{{"收货地址" + index}}</label>
-                <div class="form-group name">
-                    <input type="text" v-model="address.name" class="form-control">
+                <button class="btn btn-danger" @click="deleteAddressById(address.id)">删除</button>
+                <div class="form-group  name">
+                    <label :for="'name-'+index" class="">收货人 </label>
+                    <input type="text" :id="'name-'+index" v-model="address.name" class="form-control">
                 </div>
-                <div class="form-group mobile">
-                    <input type="text" v-model="address.mobile" class="form-control">
+                <div class="form-group  mobile">
+                    <label :for="'mobile-'+index" class="">联系方式</label>
+                    <input type="text" :id="'mobile-'+index" v-model="address.mobile" class="form-control">
                 </div>
-                <div class="form-group addressDetail">
-                    <input type="text" class="form-control" v-model="address.addressDetail">
+                <div class="form-group  addressDetail">
+                    <label :for="'addressDetail-'+index" class="">详细地址</label>
+                    <input type="text" class="form-control" :id="'addressDetail-'+index"
+                           v-model="address.addressDetail">
                 </div>
             </div>
             <div class="form-group">
-                <button type="button" class="form-control btn btn-success" style="height: 45px;">修改</button>
+                <button type="button" class="form-control btn btn-success" @click="updateAddress()"
+                        style="height: 45px;">
+                    修改
+                </button>
             </div>
+
+            <div class="modal fade" tabindex="-1" id="addAddressModel" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">添加收货地址</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form">
+                                <div class="form-group">
+                                    <label for="newName">收货人</label>
+                                    <input type="text" id="newName" v-model.trim="newAddress.name"
+                                           class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newMobile">联系方式</label>
+                                    <input type="text" id="newMobile" class="form-control"
+                                           v-model.trim="newAddress.mobile"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newAddressDetail">详细地址</label>
+                                    <input type="text" id="newAddressDetail" class="form-control"
+                                           v-model.trim="newAddress.addressDetail"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-success" @click="addAddress()">提交</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        </div>
+        <div class="cart">
+
         </div>
     </div>
 </div>
@@ -146,7 +198,8 @@
         el: "#app",
         data: {
             currentUser: {},
-            addresses: []
+            addresses: [],
+            newAddress: {},
         },
         methods: {
             uploadAvatar(event) {
@@ -156,13 +209,69 @@
                 forms.append('type', 1);
                 axios.post("/common/file/upload", forms, {
                     headers: {
-                        'Content-type': 'multipart/form-data'
+                        'Content-type': 'multipart/form-data',
+                        Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
                     }
                 }).then(response => {
                     console.log(response.data);
                     if (response.data.code === 200) {
-
+                        retrieveUserByToken();
                     }
+                }).catch(err => {
+                    console.log(err);
+                })
+            },
+            deleteAddressById: function (id) {
+                axios.delete("/client/address/deleteAddressById/" + id, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                }).then(response => {
+                    if (response.data.code === 200) {
+                        retrieveUserAddressesByToken();
+                    }
+                }).catch(err => {
+                    console.log(err);
+                })
+            },
+            addAddress: function () {
+                console.log(this.newAddress.addressDetail);
+                if (this.newAddress.addressDetail === undefined || this.newAddress.addressDetail === "") {
+                    alert("详细地址不应为空！");
+                    return;
+                }
+                if (this.newAddress.name === undefined || this.newAddress.name === "") {
+                    alert("收货人不应为空！");
+                    return;
+                }
+                if (this.newAddress.mobile === undefined || this.newAddress.mobile === "") {
+                    alert("联系方式不应为空！！");
+                    return;
+                }
+                axios.post("/client/address/addAddress", {
+                    userId: this.currentUser.id,
+                    addressDetail: this.newAddress.addressDetail,
+                    name: this.newAddress.name,
+                    mobile: this.newAddress.mobile
+                }).then(response => {
+                    if (response.data.code === 200) {
+                        retrieveUserAddressesByToken();
+                        $('#addAddressModel').modal('hide');
+                    }
+                }).catch(err => {
+                    console.log(err);
+                })
+            },
+            updateAddress: function () {
+                axios.post("/client/address/updateAddresses", this.addresses, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                }).then(response => {
+                    if (response.data.code === 200) {
+                        alert("修改地址成功！");
+                    }
+                    retrieveUserAddressesByToken();
                 }).catch(err => {
                     console.log(err);
                 })

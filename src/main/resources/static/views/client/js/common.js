@@ -15,7 +15,7 @@ var retrieveUserByToken = function () {
 }
 var retrieveUserAddressesByToken = function () {
     console.log("获取用户地址！");
-    axios.get("/client/user/retrieveUserAddressesByToken", {
+    axios.get("/client/address/retrieveAddressesByToken", {
         headers: {
             Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
         }
@@ -31,3 +31,5 @@ var retrieveUserAddressesByToken = function () {
             console.log(err);
         })
 }
+
+var accessToken = localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : "";

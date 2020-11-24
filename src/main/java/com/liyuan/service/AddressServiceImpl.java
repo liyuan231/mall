@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.liyuan.dao.MallAddressMapper;
 import com.liyuan.model.MallAddress;
 import com.liyuan.model.MallAddressExample;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -17,8 +19,10 @@ public class AddressServiceImpl {
 
     @Resource
     private MallAddressMapper addressMapper;
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public int insertSelective(MallAddress address) {
+        address.setUpdateTime(LocalDateTime.now());
         return addressMapper.insertSelective(address);
     }
 
@@ -50,5 +54,16 @@ public class AddressServiceImpl {
         MallAddressExample.Criteria criteria = mallAddressExample.createCriteria();
         criteria.andUserIdEqualTo(i);
         return addressMapper.selectByExampleSelective(mallAddressExample, columns);
+    }
+
+    public void batchUpdateSelectiveById(MallAddress[] addresses) {
+        for (MallAddress address : addresses) {
+            try {
+                updateSelectiveById(address);
+            } catch (IllegalArgumentException e) {
+                logger.error(e.getMessage());
+            }
+        }
+
     }
 }
