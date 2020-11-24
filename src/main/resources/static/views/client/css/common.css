@@ -1,0 +1,14 @@
+.main-footer {
+    text-align: center;
+    background-color: #fff;
+    margin: 20px 0 0 0;
+    padding: 20px;
+}
+
+body {
+    min-width: 600px;
+    background-color: #f2f2f2;
+}
+ul.clearfix {
+    padding: 0px;
+}

@@ -34,4 +34,11 @@ public class RoleServiceImpl {
         role.setUpdateTime(LocalDateTime.now());
         return roleMapper.insertSelective(role);
     }
+
+    public MallRole queryByName(String roleName, MallRole.Column... columns) {
+        MallRoleExample roleExample = new MallRoleExample();
+        MallRoleExample.Criteria criteria = roleExample.createCriteria();
+        criteria.andNameEqualTo(roleName);
+        return roleMapper.selectOneByExampleSelective(roleExample, columns);
+    }
 }

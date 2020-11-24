@@ -4,6 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.liyuan.component.jwt.JwtTokenGenerator;
 import com.liyuan.exception.JwtTokenMissingAuthenticationException;
+import com.liyuan.model.MallPermission;
+import com.liyuan.model.MallRole;
+import com.liyuan.service.PermissionServiceImpl;
+import com.liyuan.service.RoleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,12 +29,17 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHENTICATION_PREFIX = "Bearer ";
     private static final String AUTHORIZATION = "Authorization";
     private AuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
+    private PermissionServiceImpl permissionService;
+    @Autowired
+    private RoleServiceImpl roleService;
 
     @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
@@ -69,15 +78,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
         LocalDateTime expirationDatetime = LocalDateTime.parse((String) jsonObject.get("expiration"));
         if (LocalDateTime.now().isAfter(expirationDatetime)) {
-            throw new AuthenticationServiceException("token 过期！");
+            throw new AuthenticationServiceException("token has expired!");
         }
         //此处解析该token
         JSONArray roles = jsonObject.getJSONArray("roles");
         Collection<GrantedAuthority> authorities = new LinkedList<>();
         for (Object role : roles) {
-            String next = (String) role;
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + next));
-            //TODO 获取该用户所拥有的权限
+            String roleName = (String) role;
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+            MallRole mallRole = roleService.queryByName(roleName, MallRole.Column.id);
+            List<MallPermission> mallPermissions = permissionService.queryByRoleId(mallRole.getId(), MallPermission.Column.id, MallPermission.Column.permission);
+            for (MallPermission mallPermission : mallPermissions) {
+                authorities.add(new SimpleGrantedAuthority(mallPermission.getPermission()));
+            }
         }
         String username = jsonObject.getString("audience");
         User user = new User(username, "[PASSWORD]", authorities);
