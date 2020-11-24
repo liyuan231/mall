@@ -21,7 +21,7 @@ public class FileController {
     public Object upload(@RequestParam("file") MultipartFile file,
                          @RequestParam(value = "type", defaultValue = "-1") Integer type) {
 
-        fileService.upload();
+//        fileService.upload();
         return ResponseUtils.build(HttpStatus.OK.value(), "上传文件成功！", "这是文件地址！");
     }
 }
