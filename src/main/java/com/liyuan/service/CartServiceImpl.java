@@ -22,13 +22,13 @@ public class CartServiceImpl {
     }
 
 
-    public PageInfo querySelective(Integer userId, Integer page, Integer pageSize) {
+    public PageInfo querySelective(Integer userId, Integer page, Integer pageSize, MallCart.Column... columns) {
         MallCartExample cartExample = new MallCartExample();
         MallCartExample.Criteria criteria = cartExample.createCriteria();
         criteria.andUserIdEqualTo(userId);
         cartExample.setOrderByClause("update_time desc");
         PageHelper.startPage(page, pageSize);
-        List<MallCart> mallCarts = cartMapper.selectByExampleSelective(cartExample);
+        List<MallCart> mallCarts = cartMapper.selectByExampleSelective(cartExample, columns);
         return new PageInfo(mallCarts);
     }
 

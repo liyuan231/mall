@@ -18,10 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,19 +44,30 @@ public class ClientCartController {
     public Object listSearch(@RequestParam("page") Integer page, @RequestParam("pageSize") Integer pageSize) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         MallUser mallUser = userService.queryByUsername(user.getUsername(), MallUser.Column.id);
-        PageInfo<MallCart> pageInfo = cartService.querySelective(mallUser.getId(), page, pageSize);
+        PageInfo pageInfo = cartService.querySelective(mallUser.getId(), page, pageSize);
         List<MallCart> carts = pageInfo.getList();
         List<CartAndGoodsAndAPrimaryImage> cartAndGoodsAndAPrimaryImages = new LinkedList<>();
         for (MallCart cart : carts) {
             CartAndGoodsAndAPrimaryImage cartAndGoodsAndAPrimaryImage = new CartAndGoodsAndAPrimaryImage();
             cartAndGoodsAndAPrimaryImage.setCart(cart);
-            MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.id, MallGoods.Column.name, MallGoods.Column.price);
+            MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.id, MallGoods.Column.name, MallGoods.Column.price, MallGoods.Column.brandId);
             cartAndGoodsAndAPrimaryImage.setGoods(mallGoods);
-            MallStorage mallStorage = storageService.queryOneByUserIdAndType(mallUser.getId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
+            MallStorage mallStorage = storageService.queryOneByUserIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
+            Assert.notNull(mallStorage, "该商品无对应的主要展示图片！");
             mallStorage.setLocation(cosProperties.getBaseUrl() + mallStorage.getLocation());
             cartAndGoodsAndAPrimaryImage.setStorage(mallStorage);
+            cartAndGoodsAndAPrimaryImages.add(cartAndGoodsAndAPrimaryImage);
         }
+        pageInfo.setList(cartAndGoodsAndAPrimaryImages);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取该用户购物车列表成功！", pageInfo);
+    }
+
+
+    @DeleteMapping("/deleteById/{id}")
+    @PreAuthorize("hasAnyRole('USER')")
+    public Object deleteById(@PathVariable("id") Integer id) {
+        int i = cartService.deleteById(id);
+        return ResponseUtils.build(HttpStatus.OK.value(), "删除一个购物车记录成功！");
     }
 
 

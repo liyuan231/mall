@@ -28,7 +28,7 @@
             margin-bottom: 30px;
         }
 
-        .userAddresses {
+        .carts, .userAddresses {
             background-color: #fff;
             padding: 30px;
             border-radius: 4px;
@@ -37,6 +37,17 @@
 
         .addresses {
             margin: 60px 10px;
+        }
+
+        .solveNumber {
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            /*border: 1px solid black;*/
+            /*border-radius: 4px;*/
+            width: 15px;
+            /*height: 10px;*/
+            padding-right: 10px;
         }
     </style>
 </head>
@@ -176,7 +187,82 @@
             </div><!-- /.modal -->
         </div>
         <div class="carts">
+            <h3>我的购物车</h3>
+            <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
+                <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
+                    <label style="float: left;">
+                        <input type="checkbox" :checked="goods.cart.checked"/>
+                    </label>
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="#">
+                                <!--                                //此处写goods的id-->
+                                <img :src="goods.storage.location" class="media-object img-rounded"
+                                     style="background-color: #fff;" alt="">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">{{goods.goods.name}}</h4>
+                        </div>
+                        <div class="media-right">
+                            <div>
+                                <button type="button" class="btn btn-danger" data-target="#deleteACartModal"
+                                        data-toggle="modal" @click="deletedCartId = goods.cart.id">删除
+                                </button>
+                            </div>
+                            <div>
+                                <span @click="plusCartNumber(index)"
+                                      class="solveNumber glyphicon glyphicon-plus"></span>
+                                {{goods.cart.number}}
+                                <span @click="minusCartNumber(index)"
+                                      class="solveNumber glyphicon glyphicon-minus"></span>
+                            </div>
+                            <!--                            <p>{{goods.cart.number > 0 ? '有货' : '无货'}}</p>-->
+                            <p class="text-danger" style="float: right">￥{{goods.goods.price}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li v-if="cartsPageInfo.hasPreviousPage">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.prePage,cartsPageInfo.pageSize)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </span>
+                    </li>
+                    <li v-for="(item,index) of cartsPageInfo.navigatepageNums">
+                        <span style="cursor: pointer;" @click="this.retrieveUserCarts(item,cartsPageInfo.pageSize)">{{item}}</span>
+                    </li>
 
+                    <li v-if="cartsPageInfo.hasNextPage">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.nextPage,cartsPageInfo.pageSize)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </span>
+                    </li>
+                </ul>
+            </nav>
+            <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <!--                            <h4 class="modal-title"></h4>-->
+                        </div>
+                        <!--                        <div class="modal-body">-->
+                        <!--&lt;!&ndash;                            <p>One fine body&hellip;</p>&ndash;&gt;-->
+                        <!--                        </div>-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                    style="float: left" data-dismiss="modal">取消
+                            </button>
+                            <button type="button" class="btn btn-danger col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                    style="float: right;" @click="deleteACartById()">确认
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
         </div>
     </div>
 </div>
@@ -195,6 +281,7 @@
 <script src="./js/bootstrap.min.js"></script>
 <script>
     var retrieveUserCarts = function (page, pageSize) {
+        console.log("获取用户购物车！");
         axios.get("/client/cart/listSearch?page=" + page + "&pageSize=" + pageSize, {
             headers: {
                 Authorization: accessToken
@@ -202,8 +289,8 @@
         })
             .then(response => {
                 if (response.data.code === 200) {
-                    this.app.carts = response.data.data;
-                    // console.log(response.data.data);
+                    this.app.cartsPageInfo = response.data.data;
+                    console.log(response.data.data);
                 }
             })
             .catch(err => {
@@ -217,7 +304,29 @@
             currentUser: {},
             addresses: [],
             newAddress: {},
-            cartsPageInfo: []
+            cartsPageInfo: {
+                endRow: 5,
+                firstPage: 1,
+                hasNextPage: true,
+                hasPreviousPage: false,
+                isFirstPage: true,
+                isLastPage: false,
+                lastPage: 3,
+                list: [],
+                navigateFirstPage: 1,
+                navigateLastPage: 3,
+                navigatePages: 8,
+                navigatepageNums: [],
+                nextPage: 2,
+                pageNum: 1,
+                pageSize: 5,
+                pages: 3,
+                prePage: 0,
+                size: 5,
+                startRow: 1,
+                total: 14
+            },
+            deletedCartId: -1
         },
         methods: {
             uploadAvatar(event) {
@@ -293,12 +402,41 @@
                 }).catch(err => {
                     console.log(err);
                 })
+            },
+            plusCartNumber: function (cartIndex) {
+                this.cartsPageInfo.list[cartIndex].cart.number++;
+            },
+            minusCartNumber: function (cartIndex) {
+                if (this.cartsPageInfo.list[cartIndex].cart.number === 1) {
+                    return;
+                }
+                this.cartsPageInfo.list[cartIndex].cart.number--;
+            },
+            deleteACartById: function () {
+                console.log("删除一则购物车记录！");
+                console.log(this.deletedCartId);
+                axios.delete("/client/cart/deleteById/" + this.deletedCartId, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                })
+                    .then(response => {
+                        console.log("删除一个购物车记录成功！");
+                        if (response.data.code === 200) {
+                            retrieveUserCarts(this.cartsPageInfo.pageNum, this.cartsPageInfo.pageSize);
+                            $("#deleteACartModal").modal("hide");
+
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
             }
         },
         mounted: function () {
             retrieveUserByToken();
             retrieveUserAddressesByToken();
-            retrieveUserCarts(1, 7);
+            retrieveUserCarts(1, this.cartsPageInfo.pageSize);
         }
     });
 </script>
