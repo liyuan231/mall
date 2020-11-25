@@ -2,7 +2,7 @@ package com.liyuan.controller.client;
 
 import com.github.pagehelper.PageInfo;
 import com.liyuan.component.cos.COSProperties;
-import com.liyuan.dto.CartAndGoodsAndAPrimaryImage;
+import com.liyuan.dto.SimpleInfoCart;
 import com.liyuan.model.MallCart;
 import com.liyuan.model.MallGoods;
 import com.liyuan.model.MallStorage;
@@ -46,19 +46,26 @@ public class ClientCartController {
         MallUser mallUser = userService.queryByUsername(user.getUsername(), MallUser.Column.id);
         PageInfo pageInfo = cartService.querySelective(mallUser.getId(), page, pageSize);
         List<MallCart> carts = pageInfo.getList();
-        List<CartAndGoodsAndAPrimaryImage> cartAndGoodsAndAPrimaryImages = new LinkedList<>();
+        List<SimpleInfoCart> simpleInfoCarts = new LinkedList<>();
+        float sum = 0.0f;
         for (MallCart cart : carts) {
-            CartAndGoodsAndAPrimaryImage cartAndGoodsAndAPrimaryImage = new CartAndGoodsAndAPrimaryImage();
-            cartAndGoodsAndAPrimaryImage.setCart(cart);
+            SimpleInfoCart simpleInfoCart = new SimpleInfoCart();
+            simpleInfoCart.setCartId(cart.getId());
+            simpleInfoCart.setChecked(cart.getChecked());
             MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.id, MallGoods.Column.name, MallGoods.Column.price, MallGoods.Column.brandId);
-            cartAndGoodsAndAPrimaryImage.setGoods(mallGoods);
+            simpleInfoCart.setGoodsId(mallGoods.getId());
+            simpleInfoCart.setGoodsPrice(mallGoods.getPrice());
+            simpleInfoCart.setName(mallGoods.getName());
+            simpleInfoCart.setNumber(cart.getNumber());
             MallStorage mallStorage = storageService.queryOneByUserIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
             Assert.notNull(mallStorage, "该商品无对应的主要展示图片！");
-            mallStorage.setLocation(cosProperties.getBaseUrl() + mallStorage.getLocation());
-            cartAndGoodsAndAPrimaryImage.setStorage(mallStorage);
-            cartAndGoodsAndAPrimaryImages.add(cartAndGoodsAndAPrimaryImage);
+            simpleInfoCart.setPicUrl(cosProperties.getBaseUrl() + mallStorage.getLocation());
+            simpleInfoCart.setUpdateTime(cart.getUpdateTime());
+            simpleInfoCarts.add(simpleInfoCart);
+            sum += cart.getNumber() * mallGoods.getPrice();
         }
-        pageInfo.setList(cartAndGoodsAndAPrimaryImages);
+
+        pageInfo.setList(simpleInfoCarts);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取该用户购物车列表成功！", pageInfo);
     }
 
@@ -70,5 +77,28 @@ public class ClientCartController {
         return ResponseUtils.build(HttpStatus.OK.value(), "删除一个购物车记录成功！");
     }
 
+    @PostMapping("/check/{id}")
+    @PreAuthorize("hasAnyRole('USER')")
+    public Object check(@PathVariable("id") Integer id) {
+        int i = cartService.check(id);
+        return ResponseUtils.build(HttpStatus.OK.value(), "tick一个购物车商品成功！");
+
+    }
+
+
+    @PostMapping("/plusNumber/{cartId}")
+    @PreAuthorize("hasAnyRole('USER')")
+    public Object plusNumber(@PathVariable("cartId") Integer id) {
+        int i = cartService.plusNumber(id);
+        return ResponseUtils.build(HttpStatus.OK.value(), "增加一个购物车商品成功！");
+    }
+
+
+    @PostMapping("/minusNumber/{cartId}")
+    @PreAuthorize("hasAnyRole('USER')")
+    public Object minusNumber(@PathVariable("cartId") Integer id) {
+        int i = cartService.minusNumber(id);
+        return ResponseUtils.build(HttpStatus.OK.value(), "减少一个购物车商品成功！");
+    }
 
 }

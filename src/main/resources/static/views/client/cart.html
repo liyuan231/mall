@@ -41,6 +41,281 @@
     </style>
 </head>
 <body>
+<div id="app">
+    <div class="container">
+        <ul class="nav nav-pills" style="margin:10px 0;">
+            <li role="presentation" class=""><a href="./info.html">我的信息</a></li>
+            <li role="presentation" class="active"><a href="#">我购物车</a></li>
+            <li role="presentation"><a href="./order.html">我的订单</a></li>
+        </ul>
+
+        <div class="info">
+            <div class="carts">
+                <h3>我的购物车</h3>
+                <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
+                    <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
+                        <label style="float: left;">
+                            <!--                        此处需要分为两个处理，一个是cartId，一个是goodsId-->
+                            <input @change="check(goods.cartId)" type="checkbox" :value="goods"
+                                   v-model="checkedCart"/>
+                            <!--                        //TODO-->
+                        </label>
+                        <div class="media">
+                            <div class="media-left">
+                                <a href="#">
+                                    <!--                                //此处写goods的id-->
+                                    <img :src="goods.picUrl" class="media-object img-rounded"
+                                         style="background-color: #fff;" alt="">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">{{goods.name}}</h4>
+                            </div>
+                            <div class="media-right">
+                                <div>
+                                    <button type="button" class="btn btn-danger" data-target="#deleteACartModal"
+                                            data-toggle="modal" @click="deletedCartId = goods.cartId">删除
+                                    </button>
+                                </div>
+                                <div>
+                                <span @click="plusCartNumber(index)"
+                                      class="solveNumber glyphicon glyphicon-plus"></span>
+                                    {{goods.number}}
+                                    <span @click="minusCartNumber(index)"
+                                          class="solveNumber glyphicon glyphicon-minus"></span>
+                                </div>
+                                <!--                            <p>{{goods.cart.number > 0 ? '有货' : '无货'}}</p>-->
+                                <p class="text-danger" style="float: right">
+                                    ￥{{calculate(goods.number, goods.goodsPrice)}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li v-if="cartsPageInfo.hasPreviousPage">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.prePage,cartsPageInfo.pageSize)"
+                              aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </span>
+                        </li>
+                        <li v-for="(item,index) of cartsPageInfo.navigatepageNums">
+                        <span style="cursor: pointer;"
+                              @click="this.retrieveUserCarts(item,cartsPageInfo.pageSize)">{{item}}</span>
+                        </li>
+
+                        <li v-if="cartsPageInfo.hasNextPage">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.nextPage,cartsPageInfo.pageSize)"
+                              aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </span>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="row" style="text-align: right;">
+                    <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计{{computeAllPrice}}</p>
+                    <div class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;">结算
+                    </div>
+                </div>
+                <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <!--                            <h4 class="modal-title"></h4>-->
+                            </div>
+                            <!--                        <div class="modal-body">-->
+                            <!--&lt;!&ndash;                            <p>One fine body&hellip;</p>&ndash;&gt;-->
+                            <!--                        </div>-->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                        style="float: left" data-dismiss="modal">取消
+                                </button>
+                                <button type="button" class="btn btn-danger col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                        style="float: right;" @click="deleteACartById()">确认
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+            </div>
+
+        </div>
+    </div>
+</div>
 
 </body>
+<footer class="main-footer">
+    <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+        <b>Version</b> v1.0.0
+    </div>
+</footer>
+</body>
+<!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+<script src="./js/jquery.min.js"></script>
+<!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+<script src="./js/bootstrap.min.js"></script>
+<script>
+    var retrieveUserCarts = function (page, pageSize) {
+        console.log("获取用户购物车！");
+        axios.get("/client/cart/listSearch?page=" + page + "&pageSize=" + pageSize, {
+            headers: {
+                Authorization: accessToken
+            }
+        })
+            .then(response => {
+                function notInCheckedCart(item) {
+
+                }
+
+                // this.app.goodsIdToPrice = new Map();
+                if (response.data.code === 200) {
+                    this.app.cartsPageInfo = response.data.data;
+
+                    for (var item of this.app.cartsPageInfo.list) {
+                        for (var each of this.app.checkedCart) {
+                            if (each.cartId === item.cartId) {
+                                return;
+                            }
+                        }
+                        if (item.checked) {
+                            this.app.checkedCart.push(item);
+                        }
+                        // this.app.goodsIdToPrice.set(item.goodsId, item.goods.price);
+                        // this.app.cartIdToNumber.set(item.goods.id, item.cart.number);
+                    }
+                    // console.log(response.data.data);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+    var app = new Vue({
+        el: "#app",
+        data: {
+
+            cartsPageInfo: {
+                endRow: 5,
+                firstPage: 1,
+                hasNextPage: true,
+                hasPreviousPage: false,
+                isFirstPage: true,
+                isLastPage: false,
+                lastPage: 3,
+                list: [],
+                navigateFirstPage: 1,
+                navigateLastPage: 3,
+                navigatePages: 8,
+                navigatepageNums: [],
+                nextPage: 2,
+                pageNum: 1,
+                pageSize: 5,
+                pages: 3,
+                prePage: 0,
+                size: 5,
+                startRow: 1,
+                total: 14
+            },
+            deletedCartId: -1,
+            checkedCart: [],
+        },
+        methods: {
+            plusCartNumber: function (cartIndex) {
+                this.cartsPageInfo.list[cartIndex].number++;
+                axios.post("/client/cart/plusNumber/" + this.cartsPageInfo.list[cartIndex].cartId, {
+                    headers: {Authorization: accessToken}
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            console.log("增加一个商品成功！");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            },
+            minusCartNumber: function (cartIndex) {
+                if (this.cartsPageInfo.list[cartIndex].number === 1) {
+                    return;
+                }
+                axios.post("/client/cart/minusNumber/" + this.cartsPageInfo.list[cartIndex].cartId, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            console.log("减少一商品成功！");
+                        }
+                    }).catch(err => {
+                    console.log(err);
+                })
+                this.cartsPageInfo.list[cartIndex].number--;
+            },
+            deleteACartById: function () {
+                console.log("删除一则购物车记录！");
+                console.log(this.deletedCartId);
+                var index = 0;
+                for (var item of this.checkedCart) {
+                    if (this.deletedCartId === item.cartId) {
+                        console.log(item.cartId);
+                        this.checkedCart.splice(index, 1);
+                        break;
+                    }
+                    index++;
+                }
+                axios.delete("/client/cart/deleteById/" + this.deletedCartId, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                })
+                    .then(response => {
+                        console.log("删除一个购物车记录成功！");
+                        if (response.data.code === 200) {
+                            retrieveUserCarts(this.cartsPageInfo.pageNum, this.cartsPageInfo.pageSize);
+                            $("#deleteACartModal").modal("hide");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            },
+            calculate: function (number, price) {
+                return (number * price).toFixed(2);
+            },
+            check: function (cartId) {
+                axios.post("/client/cart/check/" + cartId, {
+                    headers: {
+                        Authorization: accessToken
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            console.log("选中一件商品！");
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            },
+        },
+        mounted: function () {
+            retrieveUserByToken();
+            retrieveUserCarts(1, this.cartsPageInfo.pageSize);
+        },
+        computed: {
+            computeAllPrice: function () {
+                var sum = 0.0;
+                for (var i of this.checkedCart) {
+                    sum += i.goodsPrice * i.number;
+                }
+                return sum.toFixed(2);
+            }
+        }
+    });
+</script>
 </html>

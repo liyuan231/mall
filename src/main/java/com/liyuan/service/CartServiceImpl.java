@@ -36,4 +36,26 @@ public class CartServiceImpl {
         return cartMapper.deleteByPrimaryKey(id);
     }
 
+    public int check(Integer id) {
+        MallCart mallCart = queryById(id);
+        mallCart.setId(id);
+        mallCart.setChecked(!mallCart.getChecked());
+        return cartMapper.updateByPrimaryKeySelective(mallCart);
+    }
+
+    private MallCart queryById(Integer id, MallCart.Column... columns) {
+        return cartMapper.selectByPrimaryKeySelective(id, columns);
+    }
+
+    public int plusNumber(Integer id) {
+        MallCart mallCart = queryById(id, MallCart.Column.id, MallCart.Column.number);
+        mallCart.setNumber(mallCart.getNumber() + 1);
+        return cartMapper.updateByPrimaryKeySelective(mallCart);
+    }
+
+    public int minusNumber(Integer id) {
+        MallCart mallCart = queryById(id, MallCart.Column.id, MallCart.Column.number);
+        mallCart.setNumber(mallCart.getNumber() > 0 ? mallCart.getNumber() - 1 : mallCart.getNumber());
+        return cartMapper.updateByPrimaryKeySelective(mallCart);
+    }
 }

@@ -12,3 +12,7 @@ body {
 ul.clearfix {
     padding: 0px;
 }
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
+    background-color: #339fd6;
+}
