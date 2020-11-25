@@ -191,7 +191,10 @@
             <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
                 <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
                     <label style="float: left;">
-                        <input type="checkbox" :checked="goods.cart.checked"/>
+                        <!--                        此处需要分为两个处理，一个是cartId，一个是goodsId-->
+                        <input type="checkbox" :value="goods.cart.id" v-model="checkedCart"
+                               @change="addGoodsId(goods.)"/>
+<!--                        //TODO-->
                     </label>
                     <div class="media">
                         <div class="media-left">
@@ -218,7 +221,8 @@
                                       class="solveNumber glyphicon glyphicon-minus"></span>
                             </div>
                             <!--                            <p>{{goods.cart.number > 0 ? '有货' : '无货'}}</p>-->
-                            <p class="text-danger" style="float: right">￥{{goods.goods.price}}</p>
+                            <p class="text-danger" style="float: right">
+                                ￥{{calculate(goods.cart.number, goods.goods.price)}}</p>
                         </div>
                     </div>
                 </div>
@@ -226,21 +230,29 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination">
                     <li v-if="cartsPageInfo.hasPreviousPage">
-                        <span @click="this.retrieveUserCarts(cartsPageInfo.prePage,cartsPageInfo.pageSize)" aria-label="Previous">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.prePage,cartsPageInfo.pageSize)"
+                              aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </span>
                     </li>
                     <li v-for="(item,index) of cartsPageInfo.navigatepageNums">
-                        <span style="cursor: pointer;" @click="this.retrieveUserCarts(item,cartsPageInfo.pageSize)">{{item}}</span>
+                        <span style="cursor: pointer;"
+                              @click="this.retrieveUserCarts(item,cartsPageInfo.pageSize)">{{item}}</span>
                     </li>
 
                     <li v-if="cartsPageInfo.hasNextPage">
-                        <span @click="this.retrieveUserCarts(cartsPageInfo.nextPage,cartsPageInfo.pageSize)" aria-label="Next">
+                        <span @click="this.retrieveUserCarts(cartsPageInfo.nextPage,cartsPageInfo.pageSize)"
+                              aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </span>
                     </li>
                 </ul>
             </nav>
+            <div class="row" style="text-align: right;">
+                <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计{{countCheckedCarts}}</p>
+                <div class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;">结算
+                </div>
+            </div>
             <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -264,6 +276,7 @@
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
         </div>
+
     </div>
 </div>
 
@@ -326,7 +339,9 @@
                 startRow: 1,
                 total: 14
             },
-            deletedCartId: -1
+            deletedCartId: -1,
+            checkedCart: [],
+            checkedGoods: []
         },
         methods: {
             uploadAvatar(event) {
@@ -431,12 +446,29 @@
                     .catch(err => {
                         console.log(err);
                     })
-            }
+            },
+            addCheckedCarts: function (cartId) {
+                console.log(cartId);
+            },
+            calculate: function (number, price) {
+
+                return (number * price).toFixed(2);
+            },
+            addGoodsId
         },
         mounted: function () {
             retrieveUserByToken();
             retrieveUserAddressesByToken();
             retrieveUserCarts(1, this.cartsPageInfo.pageSize);
+        },
+        computed: {
+            countCheckedCarts: function () {
+                var allPrice = 0.0;
+                for (var item of this.checkedCart) {
+                    console.log(item);
+                }
+
+            }
         }
     });
 </script>
