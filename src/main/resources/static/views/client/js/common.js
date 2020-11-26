@@ -33,3 +33,7 @@ var retrieveUserAddressesByToken = function () {
 }
 
 var accessToken = localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : "";
+
+var setCookie = function (key, value, expiration) {
+    document.cookie = key + "=" + value;
+}

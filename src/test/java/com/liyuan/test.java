@@ -241,7 +241,7 @@ public class test {
         for (MallGoods good : goods) {
             goodsIds.add(good.getId());
         }
-        for (int i = 0; i < 56; i++) {
+        for (int i = 0; i < 299; i++) {
             Integer userId = userIds.get((int) (Math.random() * userIds.size()));
             Integer goodsId = goodsIds.get((int) (Math.random() * goodsIds.size()));
             MallCart cart = new MallCart();

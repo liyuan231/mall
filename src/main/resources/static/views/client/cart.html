@@ -20,38 +20,70 @@
     <script src="../dist/js/axios.js"></script>
     <link rel="stylesheet" href="./css/common.css">
     <script src="./js/common.js"></script>
+
     <style>
-        .userInfo {
+        .carts {
             background-color: #fff;
             padding: 30px;
             border-radius: 4px;
             margin-bottom: 30px;
         }
 
-        .userAddresses {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 4px;
-            margin-bottom: 30px;
-        }
-
-        .addresses {
-            margin: 60px 10px;
-        }
     </style>
 </head>
 <body>
 <div id="app">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="./index.html">MALL</a>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">MALL</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <!--                <li class=""><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
+                    <!--                <li><a href="#">Link</a></li>-->
+
+                </ul>
+                <form class="navbar-form navbar-left">
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
+                    <li class="dropdown" v-if="currentUser!=null">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
+                            {{currentUser.username}}
+                            <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="./info.html">我的信息</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">退出</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
     <div class="container">
         <ul class="nav nav-pills" style="margin:10px 0;">
             <li role="presentation" class=""><a href="./info.html">我的信息</a></li>
             <li role="presentation" class="active"><a href="#">我购物车</a></li>
             <li role="presentation"><a href="./order.html">我的订单</a></li>
         </ul>
-
         <div class="info">
             <div class="carts">
-                <h3>我的购物车</h3>
+                <h3 class="modal-title">我的购物车</h3>
                 <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
                     <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
                         <label style="float: left;">
@@ -114,8 +146,9 @@
                 </nav>
                 <div class="row" style="text-align: right;">
                     <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计{{computeAllPrice}}</p>
-                    <div class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;">结算
-                    </div>
+                    <button class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;"
+                            data-target="#sumModal" data-toggle="modal">结算
+                    </button>
                 </div>
                 <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
                     <div class="modal-dialog" role="document">
@@ -140,12 +173,27 @@
                     </div><!-- /.modal-dialog -->
                 </div><!-- /.modal -->
             </div>
-
+            <div class="modal fade" id="sumModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" style="background-color: #fff;border-radius: 4px;" role="document">
+                    <div class="modal-title">
+                        <h3 style="padding:10px;">即将生成订单</h3>
+                    </div>
+                    <div class="modal-footer clearfix">
+                        <button type="button" class="btn btn-default col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                style="float: left"
+                                data-dismiss="modal">取消
+                        </button>
+                        <button type="button" class="btn btn-danger col-lg-5 col-md-5 col-sm-5 col-xs-5"
+                                style="float: right" @click="generateOrder()">确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
         </div>
+
     </div>
 </div>
 
-</body>
 <footer class="main-footer">
     <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
     All rights reserved.
@@ -158,6 +206,8 @@
 <script src="./js/jquery.min.js"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="./js/bootstrap.min.js"></script>
+<script src="./js/cookie.js"></script>
+<!--int@daffodilvarsity.edu.bd-->
 <script>
     var retrieveUserCarts = function (page, pageSize) {
         console.log("获取用户购物车！");
@@ -197,7 +247,6 @@
     var app = new Vue({
         el: "#app",
         data: {
-
             cartsPageInfo: {
                 endRow: 5,
                 firstPage: 1,
@@ -222,6 +271,7 @@
             },
             deletedCartId: -1,
             checkedCart: [],
+            currentUser: {}
         },
         methods: {
             plusCartNumber: function (cartIndex) {
@@ -302,6 +352,20 @@
                         console.log(err);
                     })
             },
+            setCookie: function (key, value, expiration) {
+                cookie.set(key, value);
+            },
+            getCookie: function (key) {
+                return cookie.get(key);
+            },
+            generateOrder: function () {
+                var str = JSON.stringify(this.checkedCart);
+                cookie.set("carts", str);
+                $("#sumModal").modal("hide");
+                setTimeout(function () {
+                    window.location = "/views/client/TheOrder.html";
+                }, 500)
+            }
         },
         mounted: function () {
             retrieveUserByToken();
