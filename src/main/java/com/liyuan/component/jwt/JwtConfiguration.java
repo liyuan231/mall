@@ -4,6 +4,8 @@ import com.liyuan.service.PermissionServiceImpl;
 import com.liyuan.service.RoleServiceImpl;
 import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,6 +34,7 @@ import java.util.*;
 @ConditionalOnProperty(prefix = "jwt.config", name = "enabled", matchIfMissing = true, havingValue = "true")
 @Configuration
 public class JwtConfiguration {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private UserServiceImpl userService;
     @Autowired
@@ -76,7 +79,8 @@ public class JwtConfiguration {
         return new AuthenticationFailureHandler() {
             @Override
             public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                String build = ResponseUtils.build(HttpStatus.BAD_REQUEST.value(), "用户名或密码错误！");
+                logger.info("[AUTHENTICATION FAILURE]" + exception.toString());
+                String build = ResponseUtils.build(HttpStatus.BAD_REQUEST.value(), exception.getMessage());
                 ResponseUtils.printJson(response, build);
             }
         };

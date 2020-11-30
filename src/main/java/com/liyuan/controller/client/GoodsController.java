@@ -4,16 +4,18 @@ import com.github.pagehelper.PageInfo;
 import com.liyuan.dto.GoodsWithOneStorage;
 import com.liyuan.model.MallGoods;
 import com.liyuan.model.MallStorage;
+import com.liyuan.model.MallUser;
 import com.liyuan.service.GoodsServiceImpl;
 import com.liyuan.service.StorageServiceImpl;
+import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.FileEnum;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +28,9 @@ public class GoodsController {
     private GoodsServiceImpl goodsService;
     @Autowired
     private StorageServiceImpl storageService;
+
+    @Autowired
+    private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
     public Object listByUpdateTime(@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
@@ -45,5 +50,15 @@ public class GoodsController {
         }
         pageInfo.setList(goodsWithOneStorages);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取最新上架商品成功！", pageInfo);
+    }
+
+    @PostMapping("/goods")
+//    @PreAuthorize("hasAnyRole('USER','STORE')")
+    public Object publish(MallGoods goods) {
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        MallUser mallUser = userService.queryByUsername(user.getUsername(), MallUser.Column.id);
+//        goods.setBrandId(mallUser.getId());
+        goodsService.insertSelective(goods);
+        return ResponseUtils.build(HttpStatus.OK.value(), "商家发布商品成功！");
     }
 }

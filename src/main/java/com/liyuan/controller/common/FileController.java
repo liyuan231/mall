@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,8 +33,8 @@ public class FileController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasAnyRole('USER','ADMINISTRATOR')")
-    public Object upload(@RequestParam("file") MultipartFile file,
-                         @RequestParam(value = "type", defaultValue = "-1") Integer type) throws IOException {
+    public Object uploadAvatar(@RequestParam("file") MultipartFile file,
+                               @RequestParam(value = "type", defaultValue = "-1") Integer type) throws IOException {
 
         String name = file.getOriginalFilename();
         String format = name.substring(name.lastIndexOf("."));
@@ -46,5 +48,17 @@ public class FileController {
         }
         PutObjectResult putObjectResult = fileService.putObject(file, type, fileName);
         return ResponseUtils.build(HttpStatus.OK.value(), "上传文件成功！");
+    }
+
+    @PostMapping("/image")
+    public Object uploadImages(@RequestParam("file") MultipartFile file) throws IOException {
+        Map<String, String> map = new HashMap<>();
+        String name = file.getOriginalFilename();
+        String format = name.substring(name.lastIndexOf("."));
+        String fileName = "/goodsImage/" + UUID.randomUUID().toString() + format;
+
+        map.put("location", fileName);
+        fileService.putObject(file, FileEnum.GOODS_IMAGE.value(), fileName);
+        return map;
     }
 }

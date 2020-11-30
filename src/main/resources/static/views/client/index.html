@@ -85,9 +85,9 @@
         }
 
 
-        div.slider{
+        div.slider {
             background-color: #fff;
-            padding:30px;
+            padding: 30px;
         }
     </style>
 </head>
@@ -236,7 +236,17 @@
             console.log(err);
         })
     }
-
+    var retrieveAllCategories = function () {
+        axios.get("/client/category/listAll")
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data.code === 200) {
+                    this.app.categories = response.data.data;
+                }
+            }).catch(function (err) {
+            console.log(err);
+        });
+    }
 
     var app = new Vue({
         el: "#app",
@@ -253,15 +263,7 @@
         },
         methods: {},
         mounted: function () {
-            axios.get("/client/category/listAll")
-                .then(function (response) {
-                    console.log(response.data);
-                    if (response.data.code === 200) {
-                        this.app.categories = response.data.data;
-                    }
-                }).catch(function (err) {
-                console.log(err);
-            });
+            retrieveAllCategories();
             axios.get("/client/goods/listSearch?page=1&pageSize=12", {
                 headers: {
                     Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""

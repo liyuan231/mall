@@ -8,6 +8,7 @@ import com.liyuan.model.MallGoodsExample;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,6 +32,7 @@ public class GoodsServiceImpl {
     }
 
     public int insertSelective(MallGoods mallGoods) {
+        mallGoods.setUpdateTime(LocalDateTime.now());
         return goodsMapper.insertSelective(mallGoods);
     }
 

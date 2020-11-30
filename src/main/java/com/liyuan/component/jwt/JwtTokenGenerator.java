@@ -33,14 +33,14 @@ public class JwtTokenGenerator {
         return new JwtTokenPair(accessToken, refreshToken);
     }
 
-    private String jwtToken(String audience, int refreshTokenExpirationDays, Set<String> roles, Map<String, String> additional) {
+    private String jwtToken(String audience, int expirationDays, Set<String> roles, Map<String, String> additional) {
         String payload = jwtPayloadBuilder
                 .audience(audience)
                 .roles(roles)
                 .additional(additional)
                 .issuer(jwtProperties.getIssuer())
                 .subscriber(jwtProperties.getSubscriber())
-                .expirationDays(jwtProperties.getTokenExpirationDays())
+                .expirationDays(expirationDays)
                 .build();
         PrivateKey aPrivate = this.keyPair.getPrivate();
         RsaSigner signer = new RsaSigner((RSAPrivateKey) aPrivate);

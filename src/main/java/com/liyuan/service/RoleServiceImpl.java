@@ -27,7 +27,6 @@ public class RoleServiceImpl {
 
     public int deleteById(Integer id) {
         return roleMapper.deleteByPrimaryKey(id);
-
     }
 
     public int insertSelective(MallRole role) {

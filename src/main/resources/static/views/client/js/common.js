@@ -37,3 +37,15 @@ var accessToken = localStorage.getItem("accessToken") != null ? "Bearer " + loca
 var setCookie = function (key, value, expiration) {
     document.cookie = key + "=" + value;
 }
+
+var retrieveAllCategories = function () {
+    axios.get("/client/category/listAll")
+        .then(function (response) {
+            console.log(response.data);
+            if (response.data.code === 200) {
+                this.app.categories = response.data.data;
+            }
+        }).catch(function (err) {
+        console.log(err);
+    });
+}
