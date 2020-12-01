@@ -49,3 +49,5 @@ var retrieveAllCategories = function () {
         console.log(err);
     });
 }
+
+var qCloudBaseUrl = "https://mall-1300780430.cos.ap-nanjing.myqcloud.com/";

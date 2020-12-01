@@ -53,11 +53,11 @@ public class GoodsController {
     }
 
     @PostMapping("/goods")
-//    @PreAuthorize("hasAnyRole('USER','STORE')")
-    public Object publish(MallGoods goods) {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        MallUser mallUser = userService.queryByUsername(user.getUsername(), MallUser.Column.id);
-//        goods.setBrandId(mallUser.getId());
+    @PreAuthorize("hasAnyRole('USER','STORE')")
+    public Object publish(@RequestBody MallGoods goods) {
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MallUser mallUser = userService.queryByUsername(principal.getUsername(), MallUser.Column.id);
+        goods.setBrandId(mallUser.getId());
         goodsService.insertSelective(goods);
         return ResponseUtils.build(HttpStatus.OK.value(), "商家发布商品成功！");
     }

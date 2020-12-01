@@ -1,7 +1,9 @@
 package com.liyuan.controller.common;
 
+import com.liyuan.model.MallStorage;
 import com.liyuan.model.MallUser;
 import com.liyuan.service.FileServiceImpl;
+import com.liyuan.service.StorageServiceImpl;
 import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.FileEnum;
 import com.liyuan.utils.ResponseUtils;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -30,6 +33,8 @@ public class FileController {
     private FileServiceImpl fileService;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private StorageServiceImpl storageService;
 
     @PostMapping("/upload")
     @PreAuthorize("hasAnyRole('USER','ADMINISTRATOR')")
@@ -51,14 +56,16 @@ public class FileController {
     }
 
     @PostMapping("/image")
-    public Object uploadImages(@RequestParam("file") MultipartFile file) throws IOException {
+    @PreAuthorize("hasAnyRole('USER','STORE')")
+    public Object uploadImage(@RequestParam("file") MultipartFile file,
+                                      @RequestParam("locationPrefix") String locationPrefix,
+                                      @RequestParam("type") Integer type) throws IOException {
         Map<String, String> map = new HashMap<>();
         String name = file.getOriginalFilename();
         String format = name.substring(name.lastIndexOf("."));
-        String fileName = "/goodsImage/" + UUID.randomUUID().toString() + format;
-
+        String fileName = locationPrefix + UUID.randomUUID().toString() + format;
         map.put("location", fileName);
-        fileService.putObject(file, FileEnum.GOODS_IMAGE.value(), fileName);
+        fileService.putObject(file, type, fileName);
         return map;
     }
 }

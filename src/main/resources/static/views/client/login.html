@@ -114,6 +114,7 @@
                     },
                 }).then(function (response) {
                     if (response.data.code === 200) {
+                        console.log("登录成功！");
                         localStorage.setItem("accessToken", response.data.data.accessToken);
                         localStorage.setItem("refreshToken", response.data.data.accessToken);
                         setTimeout(function () {
