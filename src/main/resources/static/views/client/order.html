@@ -27,6 +27,12 @@
             border-radius: 4px;
             margin-bottom: 30px;
         }
+        .order{
+            padding:20px;
+            margin:20px;
+            border-radius: 4px;
+            border:1px solid #e5e5e5;
+        }
 
     </style>
 </head>
@@ -56,9 +62,9 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
-                    <li class="dropdown" v-if="currentUser!=null">
+                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
@@ -66,8 +72,10 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="./cart.html">我的购物车</a></li>
+                            <li><a href="./order.html">我的订单</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -75,7 +83,38 @@
         </div><!-- /.container-fluid -->
     </nav>
     <div class="container">
+        <ul class="nav nav-pills" style="margin:10px 0;">
+            <li role="presentation" class=""><a href="./info.html">我的信息</a></li>
+            <li role="presentation" class=""><a href="./cart.html">我购物车</a></li>
+            <li role="presentation" class="active"><a href="./order.html">我的订单</a></li>
+        </ul>
+        <div class="orders">
+            <div class="order" v-for="(item,index) of orders">
+                <p class="text-muted">订单编号:{{item.orderId}}</p>
+                <p class="text-info">下单时间:{{item.updateTime}}</p>
+                <a class="btn btn-info" role="button" @click="" data-toggle="collapse" :href="'#orderDetail'+index"
+                   aria-expanded="false" aria-controls="collapseExample">
+                    订单详情
+                </a>
+                <div class="collapse" :id="'orderDetail'+index">
+                    <div class="well">
+                        <p class="">收货地址: <span class="text-primary">{{item.address.addressDetail}}</span></p>
+                        <p>收货人: <span class="text-primary">{{item.address.name}}</span></p>
+                        <p>联系电话: <span class="text-primary">{{item.address.mobile}}</span></p>
+                        <ul class="media-list">
+                            <li v-for="goods of item.goodsExt">
+                                <p class="">
+                                    <span class="text-primary">{{goods.name}}</span>
+                                    <span>x</span>
+                                    <span class="text-primary">{{goods.number}}</span>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
+        </div>
     </div>
     <footer class="main-footer">
         <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
@@ -95,11 +134,24 @@
     var app = new Vue({
         el: "#app",
         data: {
-            currentUser:{}
+            currentUser: {},
+            orders: []
         },
         methods: {},
         mounted: function () {
             retrieveUserByToken();
+            axios.get("/client/order/all", {
+                headers: {
+                    Authorization: accessToken
+                }
+            }).then(response => {
+                if (response.data.code === 200) {
+                    console.log(response.data);
+                    this.orders = response.data.data;
+                }
+            }).catch(err => {
+                console.log(err);
+            })
         },
         computed: {}
     });

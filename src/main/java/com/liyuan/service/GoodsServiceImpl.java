@@ -39,4 +39,16 @@ public class GoodsServiceImpl {
     public MallGoods queryById(Integer goodsId, MallGoods.Column... columns) {
         return goodsMapper.selectByPrimaryKeySelective(goodsId, columns);
     }
+
+    public int updateSelectiveById(MallGoods goods) {
+        goods.setUpdateTime(LocalDateTime.now());
+        return goodsMapper.updateByPrimaryKeySelective(goods);
+    }
+
+    public List<MallGoods> queryByBrandId(Integer brandId, MallGoods.Column... columns) {
+        MallGoodsExample goodsExample = new MallGoodsExample();
+        MallGoodsExample.Criteria criteria = goodsExample.createCriteria();
+        criteria.andBrandIdEqualTo(brandId);
+        return goodsMapper.selectByExampleSelective(goodsExample, columns);
+    }
 }

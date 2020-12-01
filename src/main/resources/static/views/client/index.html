@@ -19,11 +19,10 @@
     <script src="../dist/js/vue.js"></script>
     <script src="../dist/js/axios.js"></script>
     <link rel="stylesheet" href="./css/common.css">
+    <script src="./js/common.js"></script>
     <style>
-
-
         .categories ul {
-            margin: 10px 0px;
+            margin: 10px;
             padding-left: 0px;
             background-color: #fff;
         }
@@ -58,6 +57,9 @@
             list-style: none;
             width: 30%;
             margin: 1%;
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            padding: 20px;
         }
 
         .itemImage .itemImageDesc .name {
@@ -117,9 +119,9 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
-                    <li class="dropdown" v-if="currentUser!=null">
+                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
@@ -127,8 +129,10 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="./cart.html">我的购物车</a></li>
+                            <li><a href="./order.html">我的订单</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -136,7 +140,7 @@
         </div><!-- /.container-fluid -->
     </nav>
     <div class="container">
-        <div class="search row">
+        <div class="search row" style="margin:10px 0;">
             <div class="form-group">
                 <input type="text" style="height: 40px;" class="form-control" placeholder="请输入关键字"/>
             </div>
@@ -195,16 +199,39 @@
                 <h3 class="title">最新上架</h3>
             </div>
             <ul class="clearfix">
-                <li v-for="item of newGoods" class="itemImage">
-                    <img src="./images/bg.jpg" alt=""
-                         class="img-responsive img-rounded goodsImage">
-                    <div class="itemImageDesc">
-                        <p class="name">{{item.goods.name}}</p>
-                        <p class="price">{{item.goods.price}}</p>
-                    </div>
+                <li style="" v-for="item of newGoods.list" class="itemImage">
+                    <a :href="'/views/client/goodsDetail.html?goodsId='+item.goods.id">
+                        <img style="max-height: 200px;" :src="item.goods.primaryImage" alt=""
+                             class="img-responsive img-rounded goodsImage">
+                        <div class="itemImageDesc">
+                            <p class="name">{{item.goods.name}}</p>
+                            <p class="price">￥{{item.goods.price}}</p>
+                        </div>
+                    </a>
                 </li>
             </ul>
         </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li v-if="newGoods.hasPreviousPage">
+                        <span @click="this.retrieveIndexGoods(newGoods.prePage,newGoods.pageSize)"
+                              aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </span>
+                </li>
+                <li v-for="(item,index) of newGoods.navigatepageNums">
+                        <span style="cursor: pointer;"
+                              @click="this.retrieveIndexGoods(item,newGoods.pageSize)">{{item}}</span>
+                </li>
+
+                <li v-if="newGoods.hasNextPage">
+                        <span @click="this.retrieveIndexGoods(newGoods.nextPage,newGoods.pageSize)"
+                              aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </span>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 
@@ -222,9 +249,10 @@
 <script src="./js/bootstrap.min.js"></script>
 <script>
     var retrieveUserByToken = function () {
+        console.log(localStorage.getItem("accessToken"));
         axios.get("/common/retrieveUserByToken", {
             headers: {
-                Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+                Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : null
             }
         })
             .then(function (response) {
@@ -247,38 +275,63 @@
             console.log(err);
         });
     }
+    var retrieveIndexGoods = function (page, pageSize) {
+        axios.get("/client/goods/listSearch?page=" + page + "&pageSize=" + pageSize, {
+            headers: {
+                Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+            }
+        })
+            .then(function (response) {
+                if (response.data.code === 200) {
+                    this.app.newGoods = response.data.data;
+                }
+                console.log(response);
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
+    }
+
 
     var app = new Vue({
         el: "#app",
         data: {
             categories: [],
-            newGoods: [
-                {
-                    storage: {
-                        location: ""
-                    }, goods: {}
-                }
-            ],
-            currentUser: {}
+            newGoods: {
+                endRow: 7,
+                firstPage: 1,
+                hasNextPage: false,
+                hasPreviousPage: false,
+                isFirstPage: true,
+                isLastPage: true,
+                lastPage: 1,
+                list: [],
+                navigateFirstPage: 1,
+                navigateLastPage: 1,
+                navigatePages: 8,
+                navigatepageNums: [],
+                nextPage: 0,
+                pageNum: 1,
+                pageSize: 12,
+                pages: 1,
+                prePage: 0,
+                size: 7,
+                startRow: 1,
+                total: 7,
+            },
+            currentUser: {},
+            scrollTop: 0
         },
-        methods: {},
+        methods: {
+            handleScroll: function () {
+
+            }
+        },
         mounted: function () {
             retrieveAllCategories();
-            axios.get("/client/goods/listSearch?page=1&pageSize=12", {
-                headers: {
-                    Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
-                }
-            })
-                .then(function (response) {
-                    if (response.data.code === 200) {
-                        this.app.newGoods = response.data.data.list;
-                    }
-                    console.log(response);
-                })
-                .catch(function (err) {
-                    console.log(err);
-                })
             retrieveUserByToken();
+            retrieveIndexGoods(1, this.newGoods.pageSize);
+
         },
     });
 

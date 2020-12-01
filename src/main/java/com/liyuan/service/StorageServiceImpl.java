@@ -29,10 +29,10 @@ public class StorageServiceImpl {
         return storageMapper.insertSelective(mallStorage);
     }
 
-    public MallStorage queryOneByUserIdAndType(Integer userId, int type, MallStorage.Column... columns) {
+    public MallStorage queryOneByTargetIdAndType(Integer targetId, int type, MallStorage.Column... columns) {
         MallStorageExample storageExample = new MallStorageExample();
         MallStorageExample.Criteria criteria = storageExample.createCriteria();
-        criteria.andUserIdEqualTo(userId);
+        criteria.andTargetIdEqualTo(targetId);
         criteria.andTypeEqualTo(type);
         return storageMapper.selectOneByExampleSelective(storageExample, columns);
     }

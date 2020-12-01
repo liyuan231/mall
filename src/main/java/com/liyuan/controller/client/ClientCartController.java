@@ -57,7 +57,7 @@ public class ClientCartController {
             simpleInfoCart.setGoodsPrice(mallGoods.getPrice());
             simpleInfoCart.setName(mallGoods.getName());
             simpleInfoCart.setNumber(cart.getNumber());
-            MallStorage mallStorage = storageService.queryOneByUserIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
+            MallStorage mallStorage = storageService.queryOneByTargetIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
             Assert.notNull(mallStorage, "该商品无对应的主要展示图片！");
             simpleInfoCart.setPicUrl(cosProperties.getBaseUrl() + mallStorage.getLocation());
             simpleInfoCart.setUpdateTime(cart.getUpdateTime());
@@ -99,6 +99,17 @@ public class ClientCartController {
     public Object minusNumber(@PathVariable("cartId") Integer id) {
         int i = cartService.minusNumber(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "减少一个购物车商品成功！");
+    }
+
+    @PostMapping("/cart")
+    @PreAuthorize("hasAnyRole('USER')")
+    public Object add(@RequestBody MallCart cart) {
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MallUser mallUser = userService.queryByUsername(principal.getUsername(), MallUser.Column.id);
+        cart.setUserId(mallUser.getId());
+        cart.setChecked(false);
+        int i = cartService.insertSelective(cart);
+        return ResponseUtils.build(HttpStatus.OK.value(), "添加一个商品到购物车成功！");
     }
 
 }

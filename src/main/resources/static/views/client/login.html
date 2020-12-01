@@ -5,17 +5,17 @@
     <title>login</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
+<!--    <link rel="stylesheet"-->
+<!--          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">-->
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+<!--    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">-->
     <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<!--    <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">-->
     <!-- Theme style -->
-    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+<!--    <link rel="stylesheet" href="../dist/css/adminlte.min.css">-->
     <script src="../dist/js/vue.js"></script>
     <script src="../dist/js/axios.js"></script>
-
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
     <style>
         #loginForm {
             border: 1px solid black;
@@ -28,6 +28,10 @@
             box-shadow: 0 0 0.1rem #c2c2c2;
         }
 
+        .btn{
+            height: 45px;
+            margin:10px 0;
+        }
         .form-group {
             padding: 0 60px;
             width: 100%;
@@ -46,10 +50,40 @@
 </head>
 <body class="" style="min-height: 466px;background-color: transparent">
 <div id="app">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="./index.html">MALL</a>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">MALL</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <!--                <li class=""><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
+                    <!--                <li><a href="#">Link</a></li>-->
+
+                </ul>
+                <form class="navbar-form navbar-left">
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="./register.html">注册</a></li>
+                    <li><a href="./login.html ">登录</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
     <form id="loginForm" action="/client/login" method="post">
-        <div class="card-header" style="margin-bottom: 30px;">
-            <h2 class="card-title" style="font-size: 30px;">MALL</h2>
-            <span style="vertical-align: bottom">登录</span>
+        <div class="panel-title" style="margin:20px 0 30px 20px;">
+            <h2  class="card-title" style="font-size: 30px;display: inline-block">MALL</h2>
+            <span style="vertical-align: top">登录</span>
         </div>
         <div class="form">
             <div class="form-group">
@@ -61,15 +95,15 @@
             <div class="form-group">
                 <label for="exampleInputPassword1">密码</label>
                 <input v-model.trim="password" type="password" class="form-control" id="exampleInputPassword1"
-                       name="password" placeholder="密码">
+                       name="password" placeholder="密码" v-on:keyup.enter="login()">
                 <span class="text-danger" v-if="error">用户名或密码错误</span>
             </div>
             <div class="form-group clearfix">
                 <button @click="login()" type="button" style="float: left"
-                        class="left col-5 form-control btn btn-success">登录
+                        class="left col-lg-5 col-md-5 col-md-5 col-xs-12   btn btn-success">登录
                 </button>
                 <a href="./register.html">
-                    <button type="button" style="float: right" class="right col-5 form-control btn btn-primary">注册
+                    <button type="button" style="float: right" class="right col-lg-5 col-md-5 col-md-5 col-xs-12 btn btn-primary">注册
                     </button>
                 </a>
             </div>
@@ -82,10 +116,10 @@
 <!-- jQuery -->
 <script src="../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!--<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>-->
 <!-- AdminLTE App -->
-<script src="../dist/js/adminlte.min.js"></script>
-
+<!--<script src="../dist/js/adminlte.min.js"></script>-->
+<script src="./js/bootstrap.min.js"></script>
 <script>
     var app = new Vue({
         el: "#app",

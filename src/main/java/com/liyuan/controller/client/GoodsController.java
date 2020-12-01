@@ -13,12 +13,18 @@ import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/client/goods/")
@@ -43,7 +49,7 @@ public class GoodsController {
         List<GoodsWithOneStorage> goodsWithOneStorages = new LinkedList<>();
         for (MallGoods good : goods) {
             GoodsWithOneStorage goodsWithOneStorage = new GoodsWithOneStorage();
-            MallStorage mallStorage = storageService.queryOneByUserIdAndType(good.getId(), FileEnum.GOODS_PRIMARY_IMAGE.value());
+            MallStorage mallStorage = storageService.queryOneByTargetIdAndType(good.getId(), FileEnum.GOODS_PRIMARY_IMAGE.value());
             goodsWithOneStorage.setGoods(good);
             goodsWithOneStorage.setStorage(mallStorage);
             goodsWithOneStorages.add(goodsWithOneStorage);
@@ -55,10 +61,42 @@ public class GoodsController {
     @PostMapping("/goods")
     @PreAuthorize("hasAnyRole('USER','STORE')")
     public Object publish(@RequestBody MallGoods goods) {
+        if (Objects.nonNull(goods.getId())) {
+            goodsService.updateSelectiveById(goods);
+            return ResponseUtils.build(HttpStatus.OK.value(), "商家修改一则商品成功！", goods);
+        }
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         MallUser mallUser = userService.queryByUsername(principal.getUsername(), MallUser.Column.id);
         goods.setBrandId(mallUser.getId());
         goodsService.insertSelective(goods);
-        return ResponseUtils.build(HttpStatus.OK.value(), "商家发布商品成功！");
+        return ResponseUtils.build(HttpStatus.OK.value(), "商家发布商品成功！", goods);
+    }
+
+
+    /*
+    获取商家发布的商品
+     */
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('USER','STORE')")
+    public Object listAllGoods() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+        MallUser mallUser = userService.queryByUsername(principal.getUsername(), MallUser.Column.id);
+        List<MallGoods> goods = goodsService.queryByBrandId(mallUser.getId(), MallGoods.Column.id, MallGoods.Column.name,
+                MallGoods.Column.price, MallGoods.Column.brief, MallGoods.Column.updateTime, MallGoods.Column.primaryImage);
+        return ResponseUtils.build(HttpStatus.OK.value(), "获取该商家发布的所有商品成功！", goods);
+    }
+
+    /**
+     * 商家点进来后想要修改该则商品信息
+     *
+     * @param goodsId
+     * @return
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','STORE')")
+    public Object goods(@PathVariable("id") Integer goodsId) {
+        MallGoods mallGoods = goodsService.queryById(goodsId);
+        return ResponseUtils.build(HttpStatus.OK.value(), "获取该则商品信息成功！", mallGoods);
     }
 }

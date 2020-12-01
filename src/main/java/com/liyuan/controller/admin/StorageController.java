@@ -36,8 +36,8 @@ public class StorageController {
         for (MallStorage storage : storages) {
             StorageAndUser storageAndUser = new StorageAndUser();
             storageAndUser.setStorage(storage);
-            MallUser mallUser = userService.queryById(storage.getUserId(), MallUser.Column.username);
-            storageAndUser.setUser(mallUser);
+//            MallUser mallUser = userService.queryById(storage.getUserId(), MallUser.Column.username);
+//            storageAndUser.setUser(mallUser);
             storageAndUsers.add(storageAndUser);
         }
         pageInfo.setList(storageAndUsers);

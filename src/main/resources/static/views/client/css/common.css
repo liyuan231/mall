@@ -16,3 +16,18 @@ ul.clearfix {
 .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover{
     background-color: #339fd6;
 }
+
+.container{
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+a{
+    color:#000;
+    font-size: 16px;
+}
+
+a:active, a:hover{
+    text-decoration: none;
+    color: #00bfff;
+}

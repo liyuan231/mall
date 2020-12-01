@@ -78,9 +78,9 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
-                    <li class="dropdown" v-if="currentUser!=null">
+                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
@@ -88,15 +88,23 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="./cart.html">我的购物车</a></li>
+                            <li><a href="./order.html">我的订单</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
                     </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
+
     <div class="container">
+        <ul class="nav nav-pills" style="margin:10px 0;">
+            <li role="presentation" class="active"><a href="./info.html">我的信息</a></li>
+            <li role="presentation" ><a href="./cart.html">我购物车</a></li>
+            <li role="presentation"><a href="./order.html">我的订单</a></li>
+        </ul>
         <div class="userInfo">
             <h4>用户信息</h4>
             <div id="username" class="form-group">
@@ -186,97 +194,6 @@
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
         </div>
-        <div class="carts">
-            <h3>我的购物车</h3>
-            <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
-                <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
-                    <label style="float: left;">
-                        <!--                        此处需要分为两个处理，一个是cartId，一个是goodsId-->
-                        <input type="checkbox" :value="goods.cart.id" v-model="checkedCart"
-                               @change="addGoodsId(goods.goodsId)"/>
-<!--                        //TODO-->
-                    </label>
-                    <div class="media">
-                        <div class="media-left">
-                            <a href="#">
-                                <!--                                //此处写goods的id-->
-                                <img :src="goods.storage.location" class="media-object img-rounded"
-                                     style="background-color: #fff;" alt="">
-                            </a>
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">{{goods.goods.name}}</h4>
-                        </div>
-                        <div class="media-right">
-                            <div>
-                                <button type="button" class="btn btn-danger" data-target="#deleteACartModal"
-                                        data-toggle="modal" @click="deletedCartId = goods.cart.id">删除
-                                </button>
-                            </div>
-                            <div>
-                                <span @click="plusCartNumber(index)"
-                                      class="solveNumber glyphicon glyphicon-plus"></span>
-                                {{goods.cart.number}}
-                                <span @click="minusCartNumber(index)"
-                                      class="solveNumber glyphicon glyphicon-minus"></span>
-                            </div>
-                            <!--                            <p>{{goods.cart.number > 0 ? '有货' : '无货'}}</p>-->
-                            <p class="text-danger" style="float: right">
-                                ￥{{calculate(goods.cart.number, goods.goods.price)}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li v-if="cartsPageInfo.hasPreviousPage">
-                        <span @click="this.retrieveUserCarts(cartsPageInfo.prePage,cartsPageInfo.pageSize)"
-                              aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </span>
-                    </li>
-                    <li v-for="(item,index) of cartsPageInfo.navigatepageNums">
-                        <span style="cursor: pointer;"
-                              @click="this.retrieveUserCarts(item,cartsPageInfo.pageSize)">{{item}}</span>
-                    </li>
-
-                    <li v-if="cartsPageInfo.hasNextPage">
-                        <span @click="this.retrieveUserCarts(cartsPageInfo.nextPage,cartsPageInfo.pageSize)"
-                              aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </span>
-                    </li>
-                </ul>
-            </nav>
-            <div class="row" style="text-align: right;">
-                <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计{{countCheckedCarts}}</p>
-                <div class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;">结算
-                </div>
-            </div>
-            <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
-                            <!--                            <h4 class="modal-title"></h4>-->
-                        </div>
-                        <!--                        <div class="modal-body">-->
-                        <!--&lt;!&ndash;                            <p>One fine body&hellip;</p>&ndash;&gt;-->
-                        <!--                        </div>-->
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default col-lg-5 col-md-5 col-sm-5 col-xs-5"
-                                    style="float: left" data-dismiss="modal">取消
-                            </button>
-                            <button type="button" class="btn btn-danger col-lg-5 col-md-5 col-sm-5 col-xs-5"
-                                    style="float: right;" @click="deleteACartById()">确认
-                            </button>
-                        </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
-        </div>
-
     </div>
 </div>
 
@@ -317,30 +234,8 @@
             currentUser: {},
             addresses: [],
             newAddress: {},
-            cartsPageInfo: {
-                endRow: 5,
-                firstPage: 1,
-                hasNextPage: true,
-                hasPreviousPage: false,
-                isFirstPage: true,
-                isLastPage: false,
-                lastPage: 3,
-                list: [],
-                navigateFirstPage: 1,
-                navigateLastPage: 3,
-                navigatePages: 8,
-                navigatepageNums: [],
-                nextPage: 2,
-                pageNum: 1,
-                pageSize: 5,
-                pages: 3,
-                prePage: 0,
-                size: 5,
-                startRow: 1,
-                total: 14
-            },
-            deletedCartId: -1,
-            checkedCart: [],
+
+
             checkedGoods: []
         },
         methods: {
@@ -395,7 +290,7 @@
                     addressDetail: this.newAddress.addressDetail,
                     name: this.newAddress.name,
                     mobile: this.newAddress.mobile
-                },{
+                }, {
                     headers: {
                         Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
                     }
@@ -423,59 +318,14 @@
                     console.log(err);
                 })
             },
-            plusCartNumber: function (cartIndex) {
-                this.cartsPageInfo.list[cartIndex].cart.number++;
-            },
-            minusCartNumber: function (cartIndex) {
-                if (this.cartsPageInfo.list[cartIndex].cart.number === 1) {
-                    return;
-                }
-                this.cartsPageInfo.list[cartIndex].cart.number--;
-            },
-            deleteACartById: function () {
-                console.log("删除一则购物车记录！");
-                console.log(this.deletedCartId);
-                axios.delete("/client/cart/deleteById/" + this.deletedCartId, {
-                    headers: {
-                        Authorization: accessToken
-                    }
-                })
-                    .then(response => {
-                        console.log("删除一个购物车记录成功！");
-                        if (response.data.code === 200) {
-                            retrieveUserCarts(this.cartsPageInfo.pageNum, this.cartsPageInfo.pageSize);
-                            $("#deleteACartModal").modal("hide");
-
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            },
-            addCheckedCarts: function (cartId) {
-                console.log(cartId);
-            },
-            calculate: function (number, price) {
-
-                return (number * price).toFixed(2);
-            },
-            addGoodsId:function (id){
-
-            }
         },
         mounted: function () {
             retrieveUserByToken();
             retrieveUserAddressesByToken();
-            retrieveUserCarts(1, this.cartsPageInfo.pageSize);
+            // retrieveUserCarts(1, this.cartsPageInfo.pageSize);
         },
         computed: {
-            countCheckedCarts: function () {
-                var allPrice = 0.0;
-                for (var item of this.checkedCart) {
-                    console.log(item);
-                }
 
-            }
         }
     });
 </script>

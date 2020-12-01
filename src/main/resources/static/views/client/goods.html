@@ -20,11 +20,19 @@
     <script src="../dist/js/axios.js"></script>
     <link rel="stylesheet" href="./css/common.css">
     <script src="./js/common.js"></script>
-
-    <script src="./js/tinymce.js" referrerpolicy="origin"></script>
-
     <style>
+        .container {
+            background-color: #fff;
+            border-radius: 4px;
+        }
 
+        .media {
+            border-bottom: 1px solid #e7e7e7;
+            padding: 30px;
+        }
+        a{
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -53,9 +61,9 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
-                    <li class="dropdown" v-if="currentUser!=null">
+                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
@@ -63,8 +71,10 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="./cart.html">我的购物车</a></li>
+                            <li><a href="./order.html">我的订单</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -72,6 +82,23 @@
         </div><!-- /.container-fluid -->
     </nav>
     <div class="container">
+        <h3 class="modal-title" style="margin:15px;">我发布的商品</h3>
+        <div class="media" v-for="item of goods">
+            <div class="media-left">
+                <!--                <a href="#">-->
+                <a :href="'/views/client/publishGoods.html?goodsId='+item.id">
+                    <img class="media-object img-rounded" style="width: 140px;height: 80px;" :src="item.primaryImage"
+                         alt="">
+                </a>
+            </div>
+            <div class="media-body">
+                <span class="glyphicon glyphicon-time" style="font-size: 12px;float: right">{{item.updateTime}}</span>
+                <a :href="'/views/client/publishGoods.html?goodsId='+item.id">
+                    <h4 class="media-heading">{{item.name}}</h4>
+                </a>
+                <div>{{item.brief}}</div>
+            </div>
+        </div>
     </div>
 </div>
 <footer class="main-footer">
@@ -83,17 +110,35 @@
 </footer>
 
 </body>
+<script src="./js/jquery.min.js"></script>
+<!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+<script src="./js/bootstrap.min.js"></script>
+<script src="./js/cookie.js"></script>
 <script>
     var app = new Vue({
-        el:"#app",
-        data:{
-            currentUser:{}
+        el: "#app",
+        data: {
+            currentUser: {},
+            goods: []
         },
-        methods:{},
+        methods: {},
         mounted: function () {
             retrieveUserByToken();
-            retrieveAllCategories();
+            // function () {
+            axios.get("/client/goods/list", {
+                headers: {
+                    Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+                }
+            }).then(response => {
+                if (response.data.code === 200) {
+                    console.log(response.data.data);
+                    this.goods = response.data.data;
+                }
+            }).catch(err => {
+                console.log(err);
+            })
         }
+        // }
     });
 </script>
 </html>

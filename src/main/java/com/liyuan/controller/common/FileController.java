@@ -1,6 +1,5 @@
 package com.liyuan.controller.common;
 
-import com.liyuan.model.MallStorage;
 import com.liyuan.model.MallUser;
 import com.liyuan.service.FileServiceImpl;
 import com.liyuan.service.StorageServiceImpl;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -51,21 +49,21 @@ public class FileController {
             mallUser.setAvatar(fileName);
             userService.updateSelectiveByUsername(mallUser);
         }
-        PutObjectResult putObjectResult = fileService.putObject(file, type, fileName);
+        PutObjectResult putObjectResult = fileService.putObject(file, type, fileName, -1);
         return ResponseUtils.build(HttpStatus.OK.value(), "上传文件成功！");
     }
 
     @PostMapping("/image")
     @PreAuthorize("hasAnyRole('USER','STORE')")
     public Object uploadImage(@RequestParam("file") MultipartFile file,
-                                      @RequestParam("locationPrefix") String locationPrefix,
-                                      @RequestParam("type") Integer type) throws IOException {
+                              @RequestParam("locationPrefix") String locationPrefix,
+                              @RequestParam("type") Integer type) throws IOException {
         Map<String, String> map = new HashMap<>();
         String name = file.getOriginalFilename();
         String format = name.substring(name.lastIndexOf("."));
         String fileName = locationPrefix + UUID.randomUUID().toString() + format;
         map.put("location", fileName);
-        fileService.putObject(file, type, fileName);
+        fileService.putObject(file, type, fileName, -1);
         return map;
     }
 }

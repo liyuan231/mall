@@ -33,4 +33,11 @@ public class OrderServiceImpl {
         List<MallOrder> mallOrders = orderMapper.selectByExampleSelective(mallOrderExample, columns);
         return new PageInfo<>(mallOrders);
     }
+
+    public List<MallOrder> queryByUserId(Integer userId, MallOrder.Column... columns) {
+        MallOrderExample example = new MallOrderExample();
+        MallOrderExample.Criteria criteria = example.createCriteria();
+        criteria.andUserIdEqualTo(userId);
+        return orderMapper.selectByExampleSelective(example, columns);
+    }
 }

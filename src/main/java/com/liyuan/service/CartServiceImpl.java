@@ -26,6 +26,7 @@ public class CartServiceImpl {
         MallCartExample cartExample = new MallCartExample();
         MallCartExample.Criteria criteria = cartExample.createCriteria();
         criteria.andUserIdEqualTo(userId);
+        criteria.andFinishedEqualTo(false);
         cartExample.setOrderByClause("update_time desc");
         PageHelper.startPage(page, pageSize);
         List<MallCart> mallCarts = cartMapper.selectByExampleSelective(cartExample, columns);
@@ -43,7 +44,7 @@ public class CartServiceImpl {
         return cartMapper.updateByPrimaryKeySelective(mallCart);
     }
 
-    private MallCart queryById(Integer id, MallCart.Column... columns) {
+    public MallCart queryById(Integer id, MallCart.Column... columns) {
         return cartMapper.selectByPrimaryKeySelective(id, columns);
     }
 
@@ -57,5 +58,13 @@ public class CartServiceImpl {
         MallCart mallCart = queryById(id, MallCart.Column.id, MallCart.Column.number);
         mallCart.setNumber(mallCart.getNumber() > 0 ? mallCart.getNumber() - 1 : mallCart.getNumber());
         return cartMapper.updateByPrimaryKeySelective(mallCart);
+    }
+
+    public int setFinishedById(Integer id) {
+        MallCart cart = new MallCart();
+        cart.setId(id);
+        cart.setUpdateTime(LocalDateTime.now());
+        cart.setFinished(true);
+        return cartMapper.updateByPrimaryKeySelective(cart);
     }
 }

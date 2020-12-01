@@ -12,15 +12,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -82,11 +83,14 @@ public class SpringSecurityConfiguration {
                     antMatcher("/client/**").formLogin()
                     .and().authorizeRequests().anyRequest().permitAll();
             http.userDetailsService(userService);
-            http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
+            http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+                logger.warn(authException.getMessage());
+                ResponseUtils.printJson(response, ResponseUtils.build(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(), authException.getMessage()));
+            }).accessDeniedHandler(new AccessDeniedHandler() {
                 @Override
-                public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                    logger.warn(authException.getMessage());
-                    ResponseUtils.printJson(response, ResponseUtils.build(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(), authException.getMessage()));
+                public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                    logger.info(accessDeniedException.getMessage());
                 }
             });
         }
@@ -128,4 +132,27 @@ public class SpringSecurityConfiguration {
     }
 
 
+    @Order(2)
+    @Configuration
+    public static class CommonSpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            http.csrf().disable().
+                    antMatcher("/**").authorizeRequests().anyRequest().permitAll();
+            http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+                logger.warn(authException.getMessage());
+                ResponseUtils.printJson(response, ResponseUtils.build(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS.value(), authException.getMessage()));
+            }).accessDeniedHandler(new AccessDeniedHandler() {
+                @Override
+                public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                    logger.info(accessDeniedException.getMessage());
+                }
+            });
+            http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        }
+    }
 }

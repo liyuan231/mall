@@ -28,7 +28,6 @@
             border-radius: 4px;
             margin-bottom: 30px;
         }
-
     </style>
 </head>
 <body>
@@ -57,9 +56,9 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser==null">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser==null">登录</a></li>
-                    <li class="dropdown" v-if="currentUser!=null">
+                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
@@ -67,8 +66,10 @@
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="./cart.html">我的购物车</a></li>
+                            <li><a href="./order.html">我的订单</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -83,13 +84,12 @@
         </ul>
         <div class="info">
             <div class="carts">
-                <h3 class="modal-title">我的购物车</h3>
+                <h3>我的购物车</h3>
                 <div v-for="(goods,index) of cartsPageInfo.list" class="goods">
                     <div class="checkbox" style="border: 1px solid #555;border-radius: 4px;padding:20px;">
                         <label style="float: left;">
                             <!--                        此处需要分为两个处理，一个是cartId，一个是goodsId-->
-                            <input @change="check(goods.cartId)" type="checkbox" :value="goods"
-                                   v-model="checkedCart"/>
+                            <input type="checkbox" :value="goods" v-model="checkedCart"/>
                             <!--                        //TODO-->
                         </label>
                         <div class="media">
@@ -97,7 +97,7 @@
                                 <a href="#">
                                     <!--                                //此处写goods的id-->
                                     <img :src="goods.picUrl" class="media-object img-rounded"
-                                         style="background-color: #fff;" alt="">
+                                         style="background-color: #fff; height: 80px;width: 150px;" alt="">
                                 </a>
                             </div>
                             <div class="media-body">
@@ -145,9 +145,9 @@
                     </ul>
                 </nav>
                 <div class="row" style="text-align: right;">
-                    <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计{{computeAllPrice}}</p>
-                    <button class="btn btn-danger" style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;"
-                            data-target="#sumModal" data-toggle="modal">结算
+                    <p class="text-danger" style="font-size: 18px;font-weight: bold;">总计￥{{countCheckedCarts}}</p>
+                    <button data-target="#sumModal" data-toggle="modal" class="btn btn-danger"
+                            style="width: 100px;height: 50px;line-height: 40px; margin:0 auto;">·结算
                     </button>
                 </div>
                 <div class="modal fade" tabindex="-1" id="deleteACartModal" role="dialog">
@@ -275,48 +275,16 @@
         methods: {
             plusCartNumber: function (cartIndex) {
                 this.cartsPageInfo.list[cartIndex].number++;
-                axios.post("/client/cart/plusNumber/" + this.cartsPageInfo.list[cartIndex].cartId, {
-                    headers: {Authorization: accessToken}
-                })
-                    .then(response => {
-                        if (response.data.code === 200) {
-                            console.log("增加一个商品成功！");
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
             },
             minusCartNumber: function (cartIndex) {
                 if (this.cartsPageInfo.list[cartIndex].number === 1) {
                     return;
                 }
-                axios.post("/client/cart/minusNumber/" + this.cartsPageInfo.list[cartIndex].cartId, {
-                    headers: {
-                        Authorization: accessToken
-                    }
-                })
-                    .then(response => {
-                        if (response.data.code === 200) {
-                            console.log("减少一商品成功！");
-                        }
-                    }).catch(err => {
-                    console.log(err);
-                })
                 this.cartsPageInfo.list[cartIndex].number--;
             },
             deleteACartById: function () {
                 console.log("删除一则购物车记录！");
                 console.log(this.deletedCartId);
-                var index = 0;
-                for (var item of this.checkedCart) {
-                    if (this.deletedCartId === item.cartId) {
-                        console.log(item.cartId);
-                        this.checkedCart.splice(index, 1);
-                        break;
-                    }
-                    index++;
-                }
                 axios.delete("/client/cart/deleteById/" + this.deletedCartId, {
                     headers: {
                         Authorization: accessToken
@@ -327,13 +295,18 @@
                         if (response.data.code === 200) {
                             retrieveUserCarts(this.cartsPageInfo.pageNum, this.cartsPageInfo.pageSize);
                             $("#deleteACartModal").modal("hide");
+
                         }
                     })
                     .catch(err => {
                         console.log(err);
                     })
             },
+            addCheckedCarts: function (cartId) {
+                console.log(cartId);
+            },
             calculate: function (number, price) {
+
                 return (number * price).toFixed(2);
             },
             check: function (cartId) {
@@ -358,6 +331,10 @@
                 return cookie.get(key);
             },
             generateOrder: function () {
+                if (this.checkedCart.length === 0) {
+                    $("#sumModal").modal("hide");
+                    return;
+                }
                 var str = JSON.stringify(this.checkedCart);
                 cookie.set("carts", str);
                 $("#sumModal").modal("hide");
@@ -371,12 +348,14 @@
             retrieveUserCarts(1, this.cartsPageInfo.pageSize);
         },
         computed: {
-            computeAllPrice: function () {
-                var sum = 0.0;
-                for (var i of this.checkedCart) {
-                    sum += i.goodsPrice * i.number;
+            countCheckedCarts: function () {
+                console.log("开始结算！");
+                console.log(this.checkedCart);
+                var allPrice = 0.0;
+                for (let item of this.checkedCart) {
+                    allPrice += item.number * item.goodsPrice;
                 }
-                return sum.toFixed(2);
+                return allPrice;
             }
         }
     });

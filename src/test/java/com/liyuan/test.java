@@ -199,7 +199,7 @@ public class test {
             MallStorage mallStorage = new MallStorage();
             mallStorage.setLocation("location" + i);
             mallStorage.setType(i);
-            mallStorage.setUserId(userIds.get((int) (Math.random() * userIds.size())));
+            mallStorage.setTargetId(userIds.get((int) (Math.random() * userIds.size())));
             mallStorage.setUpdateTime(LocalDateTime.now());
             storageService.insertSelective(mallStorage);
         }
@@ -249,7 +249,7 @@ public class test {
             cart.setUserId(userId);
             cart.setGoodsId(goodsId);
             cart.setNumber(i);
-            cart.setProductId(-1);
+            cart.setBrandId(-1);
             cartService.insertSelective(cart);
         }
     }
