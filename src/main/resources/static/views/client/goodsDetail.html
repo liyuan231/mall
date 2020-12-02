@@ -52,6 +52,9 @@
             height: 45px;
             width: 45px;
         }
+        .detail{
+            overflow: hidden;
+        }
 
     </style>
 </head>
@@ -61,7 +64,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="./index.html">MALL</a>
+                 <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -136,7 +139,7 @@
                 <p class="text-info" style="margin:10px 0;">温馨提示
                     ·支持7天无理由退货</p>
             </div>
-            <div class="detail" v-html="newGoods.detail"></div>
+            <div class="detail col-lg-12 col-md-12 col-sm-12 col-xs-12" v-html="newGoods.detail"></div>
         </div>
 
         <div class="aftersale">
@@ -169,19 +172,17 @@
         },
         methods: {
             addToCart: function () {
-                console.log("添加到购物车！");
                 axios.post("/client/cart/cart", {
                     brandId: this.newGoods.brandId,
                     goodsId: this.newGoods.id,
                     number: this.number,
                 }, {
                     headers: {
-                        Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+                        Authorization: accessToken
                     }
                 }).then(response => {
                     if (response.data.code === 200) {
                         alert(response.data.message);
-
                     }
                 }).catch(err => {
                     console.log(err);

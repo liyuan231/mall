@@ -51,4 +51,8 @@ public class GoodsServiceImpl {
         criteria.andBrandIdEqualTo(brandId);
         return goodsMapper.selectByExampleSelective(goodsExample, columns);
     }
+
+    public int deleteById(Integer goodsId) {
+        return goodsMapper.deleteByPrimaryKey(goodsId);
+    }
 }

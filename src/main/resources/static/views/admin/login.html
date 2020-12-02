@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员登录</title>
+    <link rel="stylesheet" href="/views/client/css/bootstrap.min.css">
+    <script src="/views/client/js/jquery.min.js"></script>
+    <script src="/views/client/js/bootstrap.min.js"></script>
+    <script src="/views/dist/js/vue.js"></script>
+    <script src="/views/dist/js/axios.js"></script>
+    <style>
+        body {
+            /*background-color: #e5e5e5;*/
+            background-image: url("/views/images/topBG.jpg");
+        }
+
+        .container {
+            max-width: 666px;
+            /*background-color: #fff;*/
+            border-radius: 4px;
+            padding: 30px;
+            margin-top: 120px;
+            color:#fff;
+            border:1px solid #fff;
+        }
+        .text-danger{
+            color:red;
+        }
+
+        .form-group .form-control {
+            height: 45px;
+            /*margin: 30px 0;*/
+        }
+
+        button.btn {
+            height: 45px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <form id="loginForm" action="/client/login" method="post">
+        <div class="panel-title" style="margin:20px 0 30px 20px;">
+            <h2 class="card-title" style="font-size: 50px;display: inline-block">MALL</h2>
+            <span style="vertical-align: top;font-size: 25px">登录</span>
+        </div>
+        <div class="form">
+            <div class="form-group">
+                <label for="exampleInputEmail1">用户名</label>
+                <span class="text-danger" v-if="username===''">用户名不应为空</span>
+                <input v-model.trim="username" type="email" class="form-control" id="exampleInputEmail1" name="username"
+                       placeholder="邮箱">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input v-model.trim="password" type="password" class="form-control" id="exampleInputPassword1"
+                       name="password" placeholder="密码" v-on:keyup.enter="login()">
+                <span class="text-danger" v-if="error">用户名或密码错误</span>
+            </div>
+            <div class="form-group clearfix">
+                <button @click="login()" type="button" style="float: left"
+                        class=" form-control  btn btn-success">登录
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            username: "",
+            password: "",
+            error:false
+        },
+        methods: {},
+        mounted: function () {
+
+        }
+    });
+</script>
+</html>

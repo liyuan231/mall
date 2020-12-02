@@ -40,4 +40,8 @@ public class OrderServiceImpl {
         criteria.andUserIdEqualTo(userId);
         return orderMapper.selectByExampleSelective(example, columns);
     }
+
+    public MallOrder queryById(Integer orderId, MallOrder.Column... columns) {
+        return orderMapper.selectByPrimaryKeySelective(orderId, columns);
+    }
 }

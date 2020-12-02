@@ -6,8 +6,8 @@
     <title>商城管理</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!--    <link rel="stylesheet"-->
+    <!--          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">-->
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
     <!-- DataTables -->
@@ -28,7 +28,7 @@
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="../../index3.html" class="nav-link">首页</a>
+                <a href="#" class="nav-link">首页</a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
                 <a href="#" class="nav-link">联系</a>
@@ -63,7 +63,8 @@
     <aside class="main-sidebar sidebar-collapse sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="" class="brand-link">
-            <img src="../../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <img src="../../dist/img/home.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                 style="opacity: .8">
             <span class="brand-text font-weight-light">MALL</span>
         </a>
         <!-- Sidebar -->
@@ -79,7 +80,8 @@
             </div>
             <!-- Sidebar Menu -->
             <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                    data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                     <li class="nav-item ">
@@ -137,7 +139,8 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link active">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>售后管理</p>
+                                    <p>商品管理</p>
+                                </a>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -246,65 +249,82 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="app">
         <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>售后管理</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="#">首页</a></li>
-                            <li class="breadcrumb-item ">商城管理</li>
-                        </ol>
-                    </div>
-                </div>
-            </div><!-- /.container-fluid -->
-        </section>
-        <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">售后管理</h3>
+                                <h2 style="font-weight: bold" class="card-title">商品管理</h2>
+                                <div class="left  col-2">
+                                    <button @click="exportAllOrderInfos()" class="btn btn-block btn-success">导出
+                                    </button>
+                                </div>
                             </div>
                             <!-- /.card-header -->
-                            <div class="card-body">
+                            <div class="card-body" v-cloak>
                                 <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
+                                        <th>商品编号</th>
+                                        <th>商品名称</th>
+                                        <th>图片</th>
+                                        <th>关键字</th>
+                                        <th>上架时间</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>此处要获取所有的用户信息</td>
-                                        <td>Internet
-                                            Explorer 4.0
+                                    <tr v-for="item of pageInfo.list">
+                                        <td>{{item.id}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td>
+                                            <img :src="item.primaryImage" class="img img-rounded"
+                                                 style="width: 150px;height: 70px;" alt="">
                                         </td>
-                                        <td>Win 95+</td>
-                                        <td> 4</td>
-                                        <td>X</td>
+                                        <td>{{item.keywords}}</td>
+                                        <td>{{item.updateTime}}</td>
+                                        <td>
+                                            <button class="btn btn-danger" @click="deleteGoodsById(item.id)">下架</button>
+                                        </td>
                                     </tr>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-7">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
+                                            <ul class="pagination">
+                                                <li class="paginate_button page-item previous disabled "
+                                                    v-if="pageInfo.hasPreviousPage"
+                                                    id="example1_previous"
+                                                    @click="this.retrieveOrderByPageAndPageSize(pageInfo.prePage,pageInfo.pageSize)">
+                                                    <a href="#" aria-controls="example1"
+                                                       data-dt-idx="0" tabindex="0"
+                                                       class="page-link">上一页</a>
+                                                </li>
+                                                <li @click="this.retrieveOrderByPageAndPageSize(item,pageInfo.pageSize)"
+                                                    v-for="item of pageInfo.navigatepageNums"
+                                                    class="paginate_button page-item"
+                                                    :class="item===pageInfo.pageNum?'active':''" :key="item">
+                                                    <a href="#"
+                                                       aria-controls="example1"
+                                                       data-dt-idx="item"
+                                                       tabindex="0"
+                                                       class="page-link">{{item}}</a>
+                                                </li>
+                                                <li v-if="pageInfo.hasNextPage"
+                                                    @click="this.retrieveOrderByPageAndPageSize(pageInfo.nextPage,pageInfo.pageSize)"
+                                                    class="paginate_button page-item next disabled" id="example1_next">
+                                                    <a href="#" aria-controls="example1" data-dt-idx="2" tabindex="0"
+                                                       class="page-link">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <!-- /.card-body -->
                         </div>
@@ -316,67 +336,60 @@
             </div>
             <!-- /.container-fluid -->
         </section>
-        <!-- /.content -->
     </div>
     <!--  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
 
 
-
     <!--  以下均为一致，仅需微调即可使用-->
     <!-- /.content-wrapper -->
-    <div id="footer"></div>
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+        All rights reserved.
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> v1.0.0
+        </div>
+    </footer>
 
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
 </div>
 <!-- ./wrapper -->
 
-<!-- jQuery -->
+
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables  & Plugins -->
-<script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="../../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../../dist/js/demo.js"></script>
+
 <!-- Page specific script -->
+<script src="/views/dist/js/common.js"></script>
+<script src="/views/dist/js/vue.js"></script>
+<script src="/views/dist/js/axios.js"></script>
+</body>
+
 <script>
-    $(function () {
-        $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-        $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-        });
+    var app = new Vue({
+        el: "#app",
+        data: {
+            currentUser: {},
+            pageInfo: {
+                pageSize: 12,
+                pageNum: 1
+            }
+        },
+        methods: {
+            deleteGoodsById: function (goodsId) {
+                deleteGoodsById(goodsId);
+                console.log("重新获取商品！");
+
+            }
+        },
+        mounted: function () {
+            retrieveGoods(1, this.pageInfo.pageSize);
+        }
     });
 </script>
-<script type="text/javascript">
-    // $("#nav").load('component/nav.html');
-    // $("#aside").load('component/aside.html');
-    $("#footer").load('component/footer.html');
-</script>
-</body>
+
 </html>

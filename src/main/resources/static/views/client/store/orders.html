@@ -38,7 +38,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="./index.html">MALL</a>
+                <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -69,6 +69,7 @@
 
                         <ul class="dropdown-menu" v-if="currentUser.role===3">
                             <li><a href="/views/client/store/publishGoods.html">发布商品</a></li>
+                            <li><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
                             <li><a href="/views/client/store/orders.html">我收到的订单</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>
@@ -82,24 +83,33 @@
         <table class="infos table table-bordered  table-striped">
             <thead>
             <tr>
-                <th>id</th>
-                <th>商品</th>
+                <th>订单编号</th>
+                <th>商品名称</th>
+                <th>商品数量</th>
                 <th>收件人</th>
-                <th>手机号</th>
+                <th>联系方式</th>
                 <th>送货地址</th>
-                <th>数量</th>
-                <th>状态</th>
+                <th>下单时间</th>
+                <th>订单状态</th>
+                <th>操作</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <th scope="row">2</th>
-                <td></td>
-                <td>Thornton</td>
-                <td>@fat</td>
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr v-for="item of orders">
+                <td>{{item.orderId}}</td>
+                <td>{{item.goodsName}}</td>
+                <td>{{item.goodsNumber}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.mobile}}</td>
+                <td>{{item.addressDetail}}</td>
+                <td>{{item.updateTime}}</td>
+                <td v-if="item.orderCartStatus===1">等待配送</td>
+                <td v-if="item.orderCartStatus===2">配送完成</td>
+                <td>
+                    <button :disabled="item.orderCartStatus===2" @click="finishAnOrder(item.orderCartId)"
+                            class="col-lg-12 btn btn-success">订单完成
+                    </button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -127,15 +137,36 @@
         el: "#app",
         data: {
             currentUser: {},
+            orders: []
         },
-        methods: {},
+        methods: {
+            finishAnOrder: function (orderCartId) {
+                axios.post("/client/orderCart/finish?orderCartId="+orderCartId,{},{
+                    headers: {
+                        Authorization: accessToken
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            console.log(response.data.message);
+                        }
+                    }).catch(err => {
+                    console.log(err);
+                })
+            }
+        },
         mounted: function () {
             retrieveUserByToken();
 
-            axios.get("/client/cart/brand/" + this.currentUser.id)
+            axios.get("/client/cart/brandId/", {
+                headers: {
+                    Authorization: accessToken
+                }
+            })
                 .then(response => {
                     if (response.data.code === 200) {
                         console.log(response.data.data);
+                        this.orders = response.data.data;
                     }
                 }).catch(err => {
                 console.log(err);

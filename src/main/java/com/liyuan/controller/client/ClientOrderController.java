@@ -1,8 +1,6 @@
 package com.liyuan.controller.client;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.liyuan.controller.common.Status;
+import com.liyuan.utils.Status;
 import com.liyuan.dto.OrderDetailExt;
 import com.liyuan.model.*;
 import com.liyuan.service.*;
@@ -12,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,20 +35,30 @@ public class ClientOrderController {
 //        return ResponseUtils.build(HttpStatus.OK.value(), "生成一个订单成功！");
 //    }
 
+    @Autowired
+    private OrderCartServiceImpl cartOrderService;
+
     @PostMapping("/order")
     @PreAuthorize("hasAnyRole('USER')")
-    public Object add(@RequestBody MallOrder order) {
-        MallUser mallUser = userService.retrieveSecurityContextPrinciple(MallUser.Column.id);
-        order.setUserId(mallUser.getId());
-        order.setOrderStatus(Status.WAITING_FOR_DELIVERY);
-        order.setAftersaleStatus(Status.WAITING_FOR_DELIVERY);
-        orderService.insertSelective(order);
 
-        String cartIds = order.getCartIds();
-        JSONArray jsonArray = JSONObject.parseArray(cartIds);
-        for (Object o : jsonArray) {
-            Integer id = (Integer) o;
-            int i = cartService.setFinishedById(id);
+    public Object add(@RequestParam Integer addressId,
+                      @RequestParam Float goodsPrice,
+                      @RequestParam Integer[] cartIds) {
+        MallUser mallUser = userService.retrieveSecurityContextPrinciple(MallUser.Column.id);
+        MallOrder order = new MallOrder();
+        order.setUserId(mallUser.getId());
+        order.setOrderStatus(Status.ORDER_WAITING_FOR_DELIVERY);
+        order.setAftersaleStatus(Status.ORDER_WAITING_FOR_DELIVERY);
+        order.setGoodsPrice(goodsPrice);
+        order.setAddressId(addressId);
+        orderService.insertSelective(order);
+        for (Integer cartId : cartIds) {
+            MallOrderCart mallOrderCart = new MallOrderCart();
+            mallOrderCart.setCartId(cartId);
+            mallOrderCart.setOrderId(order.getId());
+            mallOrderCart.setStatus(Status.ORDER_WAITING_FOR_DELIVERY);
+            cartService.setFinishedById(cartId);
+            int i = cartOrderService.insertSelective(mallOrderCart);
         }
         return ResponseUtils.build(HttpStatus.OK.value(), "生成一个订单成功！");
     }
@@ -60,7 +67,7 @@ public class ClientOrderController {
     @PreAuthorize("hasAnyRole('USER')")
     public Object allByUserId() {
         MallUser mallUser = userService.retrieveSecurityContextPrinciple(MallUser.Column.id);
-        List<MallOrder> orders = orderService.queryByUserId(mallUser.getId(), MallOrder.Column.updateTime, MallOrder.Column.id, MallOrder.Column.addressId, MallOrder.Column.cartIds);
+        List<MallOrder> orders = orderService.queryByUserId(mallUser.getId(), MallOrder.Column.updateTime, MallOrder.Column.id, MallOrder.Column.addressId);
         List<OrderDetailExt> orderDetailExts = new LinkedList<>();
         for (MallOrder order : orders) {
             OrderDetailExt orderDetailExt = new OrderDetailExt();
@@ -68,12 +75,12 @@ public class ClientOrderController {
             orderDetailExt.setUpdateTime(order.getUpdateTime());
             MallAddress mallAddress = addressService.queryById(order.getAddressId());
             orderDetailExt.setAddress(mallAddress);
-            JSONArray cartIds = JSONObject.parseArray(order.getCartIds());
+            List<MallOrderCart> mallOrderCarts = cartOrderService.queryOneByOrderId(order.getId());
+//            JSONArray cartIds = JSONObject.parseArray(order.getCartIds());
             List<OrderDetailExt.CartAndGoodsDetailExt> cartAndGoodsDetailExtList = new LinkedList<>();
-            for (Object cartId : cartIds) {
+            for (MallOrderCart mallOrderCart : mallOrderCarts) {
                 OrderDetailExt.CartAndGoodsDetailExt ce = new OrderDetailExt.CartAndGoodsDetailExt();
-                Integer cid = (Integer) cartId;
-                MallCart cart = cartService.queryById(cid, MallCart.Column.goodsId, MallCart.Column.id, MallCart.Column.number);
+                MallCart cart = cartService.queryById(mallOrderCart.getCartId(), MallCart.Column.goodsId, MallCart.Column.id, MallCart.Column.number);
                 ce.setCartId(cart.getId());
                 ce.setNumber(cart.getNumber());
                 MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.name, MallGoods.Column.id);

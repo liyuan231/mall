@@ -36,7 +36,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="./index.html">MALL</a>
+                <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -67,6 +67,7 @@
 
                         <ul class="dropdown-menu" v-if="currentUser.role===3">
                             <li><a href="/views/client/store/publishGoods.html">发布商品</a></li>
+                            <li><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
                             <li><a href="/views/client/store/orders.html">我收到的订单</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>

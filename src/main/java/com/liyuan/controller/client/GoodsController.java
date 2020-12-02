@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/client/goods/")
+@RequestMapping("/client/goods")
 public class GoodsController {
 
     @Autowired
@@ -45,16 +45,6 @@ public class GoodsController {
                                    @RequestParam(value = "sort", defaultValue = "update_time") String sort,
                                    @RequestParam(value = "order", defaultValue = "desc") String order) {
         PageInfo pageInfo = goodsService.querySelective(keyword, page, pageSize, sort, order);
-        List<MallGoods> goods = pageInfo.getList();
-        List<GoodsWithOneStorage> goodsWithOneStorages = new LinkedList<>();
-        for (MallGoods good : goods) {
-            GoodsWithOneStorage goodsWithOneStorage = new GoodsWithOneStorage();
-            MallStorage mallStorage = storageService.queryOneByTargetIdAndType(good.getId(), FileEnum.GOODS_PRIMARY_IMAGE.value());
-            goodsWithOneStorage.setGoods(good);
-            goodsWithOneStorage.setStorage(mallStorage);
-            goodsWithOneStorages.add(goodsWithOneStorage);
-        }
-        pageInfo.setList(goodsWithOneStorages);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取最新上架商品成功！", pageInfo);
     }
 
@@ -77,7 +67,7 @@ public class GoodsController {
     获取商家发布的商品
      */
     @GetMapping("/list")
-    @PreAuthorize("hasAnyRole('USER','STORE')")
+    @PreAuthorize("hasAnyRole('STORE')")
     public Object listAllGoods() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) authentication.getPrincipal();
@@ -94,7 +84,7 @@ public class GoodsController {
      * @return
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER','STORE')")
+//    @PreAuthorize("hasAnyRole('USER','STORE')")
     public Object goods(@PathVariable("id") Integer goodsId) {
         MallGoods mallGoods = goodsService.queryById(goodsId);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取该则商品信息成功！", mallGoods);

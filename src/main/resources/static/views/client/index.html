@@ -109,7 +109,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="./index.html">MALL</a>
+                 <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -150,6 +150,7 @@
 <!--                        3->表示商家-->
                         <ul class="dropdown-menu" v-if="currentUser.role===3">
                             <li><a href="./store/publishGoods.html">发布商品</a></li>
+                            <li><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
                             <li><a href="./store/orders.html">我收到的订单</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>
@@ -221,12 +222,12 @@
             </div>
             <div class="row">
                 <div class="col-sm-6 col-md-4" v-for="item of newGoods.list">
-                    <a :href="'/views/client/goodsDetail.html?goodsId='+item.goods.id">
+                    <a :href="'/views/client/goodsDetail.html?goodsId='+item.id">
                         <div class="thumbnail">
-                            <img :src="item.goods.primaryImage" alt="">
+                            <img :src="item.primaryImage" alt="">
                             <div class="caption">
-                                <h3 class="name">{{item.goods.name}}</h3>
-                                <p class="price">￥{{item.goods.price}}</p>
+                                <h3 class="name">{{item.name}}</h3>
+                                <p class="price">￥{{item.price}}</p>
                             </div>
                         </div>
                     </a>
