@@ -67,4 +67,11 @@ public class CartServiceImpl {
         cart.setFinished(true);
         return cartMapper.updateByPrimaryKeySelective(cart);
     }
+
+    public List<MallCart> queryByBrandId(Integer brandId, MallCart.Column... columns) {
+        MallCartExample cartExample = new MallCartExample();
+        MallCartExample.Criteria criteria = cartExample.createCriteria();
+        criteria.andBrandIdEqualTo(brandId);
+        return cartMapper.selectByExampleSelective(cartExample, columns);
+    }
 }

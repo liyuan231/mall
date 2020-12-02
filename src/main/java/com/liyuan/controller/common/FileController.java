@@ -54,10 +54,10 @@ public class FileController {
     }
 
     @PostMapping("/image")
-    @PreAuthorize("hasAnyRole('USER','STORE')")
+//    @PreAuthorize("hasAnyRole('USER','STORE')")
     public Object uploadImage(@RequestParam("file") MultipartFile file,
-                              @RequestParam("locationPrefix") String locationPrefix,
-                              @RequestParam("type") Integer type) throws IOException {
+                              @RequestParam(value = "locationPrefix",required = false) String locationPrefix,
+                              @RequestParam(value = "type",required = false) Integer type) throws IOException {
         Map<String, String> map = new HashMap<>();
         String name = file.getOriginalFilename();
         String format = name.substring(name.lastIndexOf("."));

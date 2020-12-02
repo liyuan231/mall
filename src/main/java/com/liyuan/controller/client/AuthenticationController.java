@@ -3,6 +3,7 @@ package com.liyuan.controller.client;
 import com.liyuan.model.MallUser;
 import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
+import com.liyuan.utils.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public Object register(@RequestBody MallUser user) {
+        user.setRole(RoleEnum.USER.value());
         int i = userService.insertSelective(user);
         return ResponseUtils.build(HttpStatus.OK.value(), "注册成功！");
     }

@@ -275,12 +275,29 @@
         methods: {
             plusCartNumber: function (cartIndex) {
                 this.cartsPageInfo.list[cartIndex].number++;
+                axios.post("/client/cart/plusNumber/" + this.cartsPageInfo.list[cartIndex].cartId,{},{
+                    headers:{
+                        Authorization:accessToken
+                    }
+                })
             },
             minusCartNumber: function (cartIndex) {
                 if (this.cartsPageInfo.list[cartIndex].number === 1) {
                     return;
                 }
                 this.cartsPageInfo.list[cartIndex].number--;
+                axios.post("/client/cart/minusNumber/" + this.cartsPageInfo.list[cartIndex].cartId,{},{
+                    headers:{
+                        Authorization:accessToken
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            console.log(response.data.data);
+                        }
+                    }).catch(err => {
+                    console.log(err);
+                })
             },
             deleteACartById: function () {
                 console.log("删除一则购物车记录！");

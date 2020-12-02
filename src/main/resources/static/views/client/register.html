@@ -2,17 +2,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Log in (v2)</title>
+    <title>Register</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-    <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+
     <!-- Theme style -->
-    <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
     <script src="../dist/js/vue.js"></script>
     <script src="../dist/js/axios.js"></script>
 
@@ -41,6 +36,11 @@
         .text-danger {
             font-size: 12px;
             font-weight: bold;
+        }
+
+        .btn {
+            margin: 5px 0;
+            height: 45px;
         }
     </style>
 </head>
@@ -76,10 +76,11 @@
 
             <div class="form-group clearfix">
                 <button @click="register()" type="button" style="float: left"
-                        class="left col-5 form-control btn btn-success">注册
+                        class="left col-lg-5 col-md-5 col-xs-12 col-xl-12  btn btn-success">注册
                 </button>
                 <a href="./login.html">
-                    <button type="button" style="float: right" class="right col-5 form-control btn btn-primary">登录
+                    <button type="button" style="float: right"
+                            class="right col-lg-5 col-md-5 col-xs-12 col-xl-12 btn btn-primary">登录
                     </button>
                 </a>
             </div>
@@ -92,9 +93,7 @@
 <!-- jQuery -->
 <script src="../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="../dist/js/adminlte.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 <script>
     var app = new Vue({
         el: "#app",
@@ -109,6 +108,7 @@
                 if (this.username === "") {
                     return;
                 }
+
                 if (this.password !== this.passwordAgain) {
                     return;
                 }

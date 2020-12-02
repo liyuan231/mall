@@ -8,20 +8,20 @@
     <title>发布商品</title>
 
     <!-- Bootstrap -->
-    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="/views/client/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
     <!--[if lt IE 9]>
-    <script src="./js/html5shiv.min.js"></script>
-    <script src="./js/respond.min.js"></script>
+    <script src="../js/html5shiv.min.js"></script>
+    <script src="../js/respond.min.js"></script>
     <![endif]-->
-    <script src="../dist/js/vue.js"></script>
-    <script src="../dist/js/axios.js"></script>
-    <link rel="stylesheet" href="./css/common.css">
-    <script src="./js/common.js"></script>
+    <script src="/views/dist/js/vue.js"></script>
+    <script src="/views/dist/js/axios.js"></script>
+    <link rel="stylesheet" href="/views/client/css/common.css">
+    <script src="/views/client/js/common.js"></script>
 
-    <script src="./js/tinymce.js" referrerpolicy="origin"></script>
+    <script src="/views/client/js/tinymce.js" referrerpolicy="origin"></script>
 
     <style>
         .container {
@@ -64,10 +64,10 @@
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
                             {{currentUser.username}}
                             <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="./info.html">我的信息</a></li>
-                            <li><a href="./cart.html">我的购物车</a></li>
-                            <li><a href="./order.html">我的订单</a></li>
+
+                        <ul class="dropdown-menu" v-if="currentUser.role===3">
+                            <li><a href="/views/client/store/publishGoods.html">发布商品</a></li>
+                            <li><a href="/views/client/store/orders.html">我收到的订单</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
@@ -141,10 +141,10 @@
 
 </body>
 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
-<script src="./js/jquery.min.js"></script>
+<script src="/views/client/js/jquery.min.js"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
-<script src="./js/bootstrap.min.js"></script>
-<script src="./js/cookie.js"></script>
+<script src="/views/client/js/bootstrap.min.js"></script>
+<script src="/views/client/js/cookie.js"></script>
 <!--int@daffodilvarsity.edu.bd-->
 <script>
     tinymce.init({

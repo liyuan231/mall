@@ -25,7 +25,7 @@ public class UserController {
 
 
     @GetMapping("/retrieveUserByToken")
-    @PreAuthorize("hasAnyRole('USER','ADMINISTRATOR')")
+    @PreAuthorize("hasAnyRole('USER','ADMINISTRATOR','STORE')")
     public Object retrieveUserByToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();

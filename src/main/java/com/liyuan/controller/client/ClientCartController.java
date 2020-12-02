@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -52,14 +51,18 @@ public class ClientCartController {
             SimpleInfoCart simpleInfoCart = new SimpleInfoCart();
             simpleInfoCart.setCartId(cart.getId());
             simpleInfoCart.setChecked(cart.getChecked());
-            MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.id, MallGoods.Column.name, MallGoods.Column.price, MallGoods.Column.brandId);
+            MallGoods mallGoods = goodsService.queryById(cart.getGoodsId(), MallGoods.Column.id, MallGoods.Column.name, MallGoods.Column.price, MallGoods.Column.brandId,MallGoods.Column.primaryImage);
             simpleInfoCart.setGoodsId(mallGoods.getId());
             simpleInfoCart.setGoodsPrice(mallGoods.getPrice());
             simpleInfoCart.setName(mallGoods.getName());
             simpleInfoCart.setNumber(cart.getNumber());
-            MallStorage mallStorage = storageService.queryOneByTargetIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
-            Assert.notNull(mallStorage, "该商品无对应的主要展示图片！");
-            simpleInfoCart.setPicUrl(cosProperties.getBaseUrl() + mallStorage.getLocation());
+//            MallStorage mallStorage = storageService.queryOneByTargetIdAndType(mallGoods.getBrandId(), FileEnum.GOODS_PRIMARY_IMAGE.value(), MallStorage.Column.location);
+//            Assert.notNull(mallStorage, "该商品无对应的主要展示图片！");
+//            if (mallStorage == null) {
+//                mallStorage = new MallStorage();
+//                mallStorage.setLocation("-1");
+//            }
+            simpleInfoCart.setPicUrl( mallGoods.getPrimaryImage());
             simpleInfoCart.setUpdateTime(cart.getUpdateTime());
             simpleInfoCarts.add(simpleInfoCart);
             sum += cart.getNumber() * mallGoods.getPrice();
@@ -110,6 +113,13 @@ public class ClientCartController {
         cart.setChecked(false);
         int i = cartService.insertSelective(cart);
         return ResponseUtils.build(HttpStatus.OK.value(), "添加一个商品到购物车成功！");
+    }
+
+    @GetMapping("/cart/brand/{brandId}")
+    public Object queryByBrandId(@PathVariable("brandId")Integer brandId){
+        List<MallCart> mallCarts = cartService.queryByBrandId(brandId);
+
+        return ResponseUtils.build(HttpStatus.OK.value(),"商家获取他的订单s成功！",mallCarts);
     }
 
 }

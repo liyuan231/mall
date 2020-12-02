@@ -91,6 +91,16 @@
             background-color: #fff;
             padding: 30px;
         }
+        .row{
+            padding:0 30px;
+        }
+        .price{
+            color:red;
+        }
+        .name{
+            font-weight: bold;
+            /*color: #fff;*/
+        }
     </style>
 </head>
 <body>
@@ -127,13 +137,24 @@
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
                             {{currentUser.username}}
                             <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
+<!--                        2->表示用户-->
+                        <ul class="dropdown-menu" v-if="currentUser.role===2">
                             <li><a href="./info.html">我的信息</a></li>
                             <li><a href="./cart.html">我的购物车</a></li>
                             <li><a href="./order.html">我的订单</a></li>
+
                             <li role="separator" class="divider"></li>
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
+
+<!--                        3->表示商家-->
+                        <ul class="dropdown-menu" v-if="currentUser.role===3">
+                            <li><a href="./store/publishGoods.html">发布商品</a></li>
+                            <li><a href="./store/orders.html">我收到的订单</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a @click="this.clientLogout()" href="#">退出</a></li>
+                        </ul>
+
                     </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
@@ -198,18 +219,22 @@
                 <span class="more" style="float: right;display: inline-block;padding:2px;">更多最新商品 ></span>
                 <h3 class="title">最新上架</h3>
             </div>
-            <ul class="clearfix">
-                <li style="" v-for="item of newGoods.list" class="itemImage">
+            <div class="row">
+                <div class="col-sm-6 col-md-4" v-for="item of newGoods.list">
                     <a :href="'/views/client/goodsDetail.html?goodsId='+item.goods.id">
-                        <img style="max-height: 200px;" :src="item.goods.primaryImage" alt=""
-                             class="img-responsive img-rounded goodsImage">
-                        <div class="itemImageDesc">
-                            <p class="name">{{item.goods.name}}</p>
-                            <p class="price">￥{{item.goods.price}}</p>
+                        <div class="thumbnail">
+                            <img :src="item.goods.primaryImage" alt="">
+                            <div class="caption">
+                                <h3 class="name">{{item.goods.name}}</h3>
+                                <p class="price">￥{{item.goods.price}}</p>
+                            </div>
                         </div>
                     </a>
-                </li>
-            </ul>
+
+                </div>
+            </div>
+
+
         </div>
         <nav aria-label="Page navigation">
             <ul class="pagination">
