@@ -29,6 +29,7 @@ public class AdministratorServiceImpl implements UserDetailsService {
 
     public PageInfo listSearch(String keyword, Integer page, Integer pageSize, MallAdmin.Column... columns) {
         MallAdminExample mallAdminExample = new MallAdminExample();
+        mallAdminExample.setOrderByClause("id desc");
         MallAdminExample.Criteria criteria = mallAdminExample.createCriteria();
         criteria.andUsernameLike("%" + keyword + "%");
         PageHelper.startPage(page, pageSize);

@@ -19,6 +19,7 @@ public class StorageServiceImpl {
 
     public PageInfo querySelective(Integer page, Integer pageSize, MallStorage.Column... columns) {
         MallStorageExample mallStorageExample = new MallStorageExample();
+        mallStorageExample.setOrderByClause("update_time desc");
         PageHelper.startPage(page, pageSize);
         List<MallStorage> mallStorages = storageMapper.selectByExampleSelective(mallStorageExample, columns);
         return new PageInfo(mallStorages);

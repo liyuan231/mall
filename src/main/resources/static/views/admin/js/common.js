@@ -1,6 +1,7 @@
 var adminAccessToken = localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : null;
 
-var retrieveAllSystemConfiguration=function (){
+
+var retrieveAllSystemConfiguration = function () {
     axios.get("/system/listAll", {
         headers: {
             Authorization: adminAccessToken

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>我发布的商品</title>
+    <title>我的信息</title>
 
     <!-- Bootstrap -->
-    <link href="/views/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
 
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
@@ -21,36 +21,16 @@
     <link rel="stylesheet" href="/views/client/css/common.css">
     <script src="/views/client/js/common.js"></script>
     <style>
-        .container {
+        .userInfo {
             background-color: #fff;
-            border-radius: 4px;
-        }
-
-        .media {
             padding: 30px;
-            border-bottom: 1px solid #e5e5e5;
             border-radius: 4px;
-        }
-
-        .name {
-            padding-bottom: 5px;
-            font-weight: bold;
-            font-size: 30px;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .price {
-            color: red;
-            font-size: 20px;
-            padding: 10px 0;
-        }
-
-        .updateTime {
-            float: right;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
+
 <div id="app">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
@@ -76,17 +56,16 @@
                 <form class="navbar-form navbar-left">
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="./register.html" v-if="currentUser.id===undefined">注册</a></li>
-                    <li><a href="./login.html" v-if="currentUser.id===undefined">登录</a></li>
+                    <li><a href="/views/client/register.html" v-if="currentUser.id===undefined">注册</a></li>
+                    <li><a href="/views/client/login.html" v-if="currentUser.id===undefined">登录</a></li>
                     <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
                             <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
                             {{currentUser.username}}
                             <span class="caret"></span></a>
-
                         <ul class="dropdown-menu" v-if="currentUser.role===3">
-                            <li><a href="./info.html">我的信息</a></li>
+                            <li><a href="/views/client/store/info.html">我的信息</a></li>
                             <li><a href="/views/client/store/publishGoods.html">发布商品</a></li>
                             <li><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
                             <li><a href="/views/client/store/orders.html">我收到的订单</a></li>
@@ -98,59 +77,89 @@
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
+
     <div class="container">
         <ul class="nav nav-pills" style="margin:10px 0;">
-            <li role="presentation"><a href="./info.html">我的信息</a></li>
+            <li role="presentation" class="active"><a href="./info.html">我的信息</a></li>
             <li><a href="/views/client/store/publishGoods.html">发布商品</a></li>
-            <li role="presentation" class="active"><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
+            <li role="presentation"><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
             <li role="presentation"><a href="/views/client/store/orders.html">我的订单</a></li>
         </ul>
-        <div class="media" v-for="item of goodsList">
-            <a :href="'/views/client/store/publishGoods.html?goodsId='+item.id">
-                <div class="media-left">
-                    <img class="media-object" style="width: 200px;height: 150px;" :src="item.primaryImage" alt="...">
+        <div class="userInfo">
+            <h4>用户信息</h4>
+            <div id="username" class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" disabled class="form-control" :value="currentUser.username"/>
+            </div>
+            <div class="form-group">
+                <label for="role">角色</label>
+                <input type="text" disabled class="form-control" id="role" :value="currentUser.role">
+            </div>
+            <div class="form-group">
+                <label>头像</label>
+                <!--                <form action="/common/upload" method="post">-->
+                <div class="avatar">
+                    <label for="uploadAvatar">
+                        <img :src="currentUser.avatar" alt="" class="img-thumbnail" style="width: 140px;height: 140px;">
+                    </label>
+                    <input multiple id="uploadAvatar" @change="uploadAvatar" class="btn"
+                           style="display: none;width: 140px;height: 140px;border-radius: 4px;border:1px solid black;"
+                           type="file"/>
                 </div>
-                <div class="media-body">
-                    <span class="updateTime glyphicon-time glyphicon">{{item.updateTime}}</span>
-                    <h4 class="media-heading name">{{item.name}}</h4>
-                    <span class="price">￥{{item.price}}</span>
-                    <p class="text-info brief">{{item.brief}}</p>
-                </div>
-            </a>
+                <!--                    <div class="form-group">-->
+                <!--                        <button type="submit" class="btn btn-success form-control">修改</button>-->
+                <!--                    </div>-->
+                <!--                </form>-->
+            </div>
         </div>
     </div>
 </div>
 
+<footer class="main-footer">
+    <strong>Copyright &copy; 2020 <a href="">MALL</a></strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+        <b>Version</b> v1.0.0
+    </div>
+</footer>
 </body>
 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
 <script src="/views/client/js/jquery.min.js"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="/views/client/js/bootstrap.min.js"></script>
-<script src="/views/client/js/cookie.js"></script>
 <script>
     var app = new Vue({
         el: "#app",
         data: {
             currentUser: {},
-            goodsList: []
         },
-        methods: {},
+        methods: {
+            uploadAvatar(event) {
+                const file = event.target.files[0];
+                var forms = new FormData();
+                forms.append('file', file);
+                forms.append('type', 1);
+                axios.post("/common/file/upload", forms, {
+                    headers: {
+                        'Content-type': 'multipart/form-data',
+                        Authorization: localStorage.getItem("accessToken") != null ? "Bearer " + localStorage.getItem("accessToken") : ""
+                    }
+                }).then(response => {
+                    console.log(response.data);
+                    if (response.data.code === 200) {
+                        retrieveUserByToken();
+                    }
+                }).catch(err => {
+                    console.log(err);
+                })
+            },
+        },
         mounted: function () {
             retrieveUserByToken();
-            console.log("获取商家发布的所有商品!");
-            axios.get("/client/goods/list", {
-                headers: {
-                    Authorization: accessToken
-                }
-            }).then(response => {
-                if (response.data.code === 200) {
-                    console.log(response.data.message);
-                    this.goodsList = response.data.data;
-                }
-            }).catch(err => {
-                console.log(err);
-            })
-        }
+            // retrieveUserCarts(1, this.cartsPageInfo.pageSize);
+        },
+        computed: {}
     });
 </script>
+
 </html>

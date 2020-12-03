@@ -41,12 +41,13 @@ public class SpringSecurityConfiguration {
     private static Logger logger = LoggerFactory.getLogger(SpringSecurityConfiguration.class);
 
     @Bean
+    @Primary
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    @Primary
+
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }

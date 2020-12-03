@@ -8,6 +8,7 @@
 
     <!-- Theme style -->
     <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="/views/client/css/common.css">
     <script src="../dist/js/vue.js"></script>
     <script src="../dist/js/axios.js"></script>
 
@@ -18,7 +19,7 @@
             margin: 0 auto;
             margin-top: 120px;
             width: 500px;
-            height: 500px;
+            /*height: 500px;*/
             background-color: rgba(0, 0, 0, 0.05);
             box-shadow: 0 0 0.1rem #c2c2c2;
         }
@@ -36,6 +37,7 @@
         .text-danger {
             font-size: 12px;
             font-weight: bold;
+            color: red;
         }
 
         .btn {
@@ -46,6 +48,36 @@
 </head>
 <body class="" style="min-height: 466px;background-color: transparent">
 <div id="app">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/views/client/index.html">MALL</a>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">MALL</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <!--                <li class=""><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
+                    <!--                <li><a href="#">Link</a></li>-->
+
+                </ul>
+                <form class="navbar-form navbar-left">
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="./register.html">注册</a></li>
+                    <li><a href="./login.html ">登录</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
     <div id="loginForm">
         <div class="card-header" style="margin-bottom: 30px;">
             <h2 class="card-title" style="font-size: 30px;">MALL<span style="font-size: 18px;">注册</span></h2>
@@ -55,6 +87,7 @@
                 <label for="exampleInputEmail1">用户名</label>
 
                 <span class="text-danger" v-if="username.trim()===''">用户名不应为空</span>
+                <span class="text-danger" v-if="username.trim().indexOf('@')===-1">请输入正确的邮箱号</span>
                 <input v-model.trim="username" type="email" class="form-control" id="exampleInputEmail1" name="username"
                        placeholder="邮箱">
             </div>
@@ -71,6 +104,13 @@
                        placeholder="请再次输入密码">
                 <span class="text-danger" v-if="password.length<6">密码长度应大于6位数</span>
                 <span class="text-danger" v-if="usernameAlreadyExist">用户名已存在</span>
+            </div>
+            <div class="form-group" style="position:relative;">
+                <label for="emailCode">邮箱验证码</label>
+                <input id="emailCode" type="text" class="form-control" v-model.trim="code"/>
+                <button class="btn btn-success" style="float: right;position:absolute;top:20px;right:60px;"
+                        @click="sendEmailCode">获取邮箱验证码
+                </button>
             </div>
 
             <div class="form-group clearfix">
@@ -99,6 +139,7 @@
         data: {
             username: "",
             password: "",
+            code: "",
             passwordAgain: "",
             usernameAlreadyExist: false,
         },
@@ -107,7 +148,9 @@
                 if (this.username === "") {
                     return;
                 }
-
+                if (this.username.indexOf("@") === -1) {
+                    return;
+                }
                 if (this.password !== this.passwordAgain) {
                     return;
                 }
@@ -115,11 +158,9 @@
                     return;
                 }
                 console.log("开始注册！");
-                axios.post("/client/user/register", {
-                    username: this.username,
-                    password: this.password
-                }).then(function (response) {
+                axios.post("/client/user/register?username=" + this.username + "&password=" + this.password + "&code=" + this.code).then(function (response) {
                     console.log(response);
+                    alert(response.data.message);
                     if (response.data.code === 200) {
                         alert("注册成功！即将跳转到登录界面！");
                         setTimeout(function () {
@@ -130,6 +171,22 @@
                     console.log("注册失败！");
                     this.app.usernameAlreadyExist = true;
                 }).catch(function (err) {
+                    console.log(err);
+                })
+            },
+            sendEmailCode: function () {
+                if (this.username === "" || this.username.indexOf("@") === -1) {
+                    alert("请输入正确的邮箱号！");
+                    return;
+                }
+                axios.post("/common/email/sendEmailCode?username=" + this.username,)
+                    .then(response => {
+                        console.log(response.data.message);
+                        alert(response.data.message);
+                        if (response.data.code === 200) {
+
+                        }
+                    }).catch(err => {
                     console.log(err);
                 })
             }

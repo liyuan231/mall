@@ -1,3 +1,18 @@
+
+var retrieveAd = function (index) {
+    axios.get("/common/ad/" + index)
+        .then(response => {
+            console.log(response.data.message);
+            if (response.data.code === 200) {
+                this.app.ads = response.data.data;
+            }
+        }).catch(err => {
+        console.log(err);
+    })
+
+}
+
+
 var retrieveUserByToken = function () {
     console.log(localStorage.getItem("accessToken"));
     axios.get("/common/retrieveUserByToken", {

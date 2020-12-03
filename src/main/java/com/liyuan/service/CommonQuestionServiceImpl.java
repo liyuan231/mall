@@ -23,6 +23,7 @@ public class CommonQuestionServiceImpl {
 
     public PageInfo querySelective(String keyword, Integer page, Integer pageSize, MallIssue.Column... columns) {
         MallIssueExample mallIssueExample = new MallIssueExample();
+        mallIssueExample.setOrderByClause("id desc");
         MallIssueExample.Criteria criteria = mallIssueExample.createCriteria();
         criteria.andQuestionLike("%" + keyword + "%");
         PageHelper.startPage(page, pageSize);

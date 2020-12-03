@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -30,6 +31,8 @@ import java.util.List;
 public class UserServiceImpl implements UserDetailsService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Resource
     private MallUserMapper userMapper;
     @Autowired
@@ -60,6 +63,7 @@ public class UserServiceImpl implements UserDetailsService {
     public int insertSelective(MallUser user) {
         MallUser mallUser = queryByUsername(user.getUsername());
         Assert.isNull(mallUser, "用户名已存在！");
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setUpdateTime(LocalDateTime.now());
         return userMapper.insertSelective(user);
     }
@@ -94,8 +98,8 @@ public class UserServiceImpl implements UserDetailsService {
         return userMapper.updateByExampleSelective(mallUser, userExample);
     }
 
-    public MallUser retrieveSecurityContextPrinciple(MallUser.Column...columns) {
+    public MallUser retrieveSecurityContextPrinciple(MallUser.Column... columns) {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return queryByUsername(principal.getUsername(),columns);
+        return queryByUsername(principal.getUsername(), columns);
     }
 }

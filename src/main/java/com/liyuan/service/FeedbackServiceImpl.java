@@ -19,6 +19,7 @@ public class FeedbackServiceImpl {
 
     public PageInfo querySelective(String keyWord, Integer page, Integer pageSize, MallFeedback.Column... columns) {
         MallFeedbackExample mallFeedbackExample = new MallFeedbackExample();
+        mallFeedbackExample.setOrderByClause("id desc");
         MallFeedbackExample.Criteria criteria = mallFeedbackExample.createCriteria();
         criteria.andTitleLike("%" + keyWord + "%");
         PageHelper.startPage(page, pageSize);

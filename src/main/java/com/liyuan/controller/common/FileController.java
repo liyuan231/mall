@@ -42,7 +42,7 @@ public class FileController {
     private COSProperties cosProperties;
 
     @PostMapping("/upload")
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','STORE')")
     public Object uploadAvatar(@RequestParam("file") MultipartFile file,
                                @RequestParam(value = "type", defaultValue = "-1") Integer type) throws IOException {
         String name = file.getOriginalFilename();

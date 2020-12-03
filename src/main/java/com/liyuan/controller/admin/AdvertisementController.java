@@ -49,7 +49,7 @@ public class AdvertisementController {
     @PostMapping("/add")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public Object add(@RequestBody MallAd ad) {
-
+        int i = advertisementService.insertSelective(ad);
         return ResponseUtils.build(HttpStatus.OK.value(), "上传一则广告成功！");
     }
 

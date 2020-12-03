@@ -58,7 +58,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                 <a class="navbar-brand" href="/views/client/index.html">MALL</a>
+                <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -102,7 +102,7 @@
     <div class="container">
         <ul class="nav nav-pills" style="margin:10px 0;">
             <li role="presentation" class="active"><a href="./info.html">我的信息</a></li>
-            <li role="presentation" ><a href="./cart.html">我购物车</a></li>
+            <li role="presentation"><a href="./cart.html">我购物车</a></li>
             <li role="presentation"><a href="./order.html">我的订单</a></li>
         </ul>
         <div class="userInfo">
@@ -210,24 +210,6 @@
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="./js/bootstrap.min.js"></script>
 <script>
-    var retrieveUserCarts = function (page, pageSize) {
-        console.log("获取用户购物车！");
-        axios.get("/client/cart/listSearch?page=" + page + "&pageSize=" + pageSize, {
-            headers: {
-                Authorization: accessToken
-            }
-        })
-            .then(response => {
-                if (response.data.code === 200) {
-                    this.app.cartsPageInfo = response.data.data;
-                    console.log(response.data.data);
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
-
     var app = new Vue({
         el: "#app",
         data: {
@@ -324,9 +306,7 @@
             retrieveUserAddressesByToken();
             // retrieveUserCarts(1, this.cartsPageInfo.pageSize);
         },
-        computed: {
-
-        }
+        computed: {}
     });
 </script>
 

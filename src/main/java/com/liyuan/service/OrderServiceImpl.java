@@ -28,6 +28,7 @@ public class OrderServiceImpl {
 
     public PageInfo querySelective(String keyword, Integer page, Integer pageSize, MallOrder.Column... columns) {
         MallOrderExample mallOrderExample = new MallOrderExample();
+        mallOrderExample.setOrderByClause("update_time desc");
         MallOrderExample.Criteria criteria = mallOrderExample.createCriteria();
         PageHelper.startPage(page, pageSize);
         List<MallOrder> mallOrders = orderMapper.selectByExampleSelective(mallOrderExample, columns);

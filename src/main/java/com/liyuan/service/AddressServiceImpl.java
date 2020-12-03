@@ -28,6 +28,7 @@ public class AddressServiceImpl {
 
     public PageInfo querySelective(String keyWord, Integer page, Integer pageSize, MallAddress.Column... columns) {
         MallAddressExample addressExample = new MallAddressExample();
+        addressExample.setOrderByClause("id desc");
         MallAddressExample.Criteria criteria = addressExample.createCriteria();
         criteria.andAddressDetailLike("%" + keyWord + "%");
         PageHelper.startPage(page, pageSize);

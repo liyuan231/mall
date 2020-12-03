@@ -505,7 +505,11 @@
                 return;
             }
             console.log("delete address ->" + this.deletedAddressId)
-            axios.delete("/address/delete/" + this.deletedAddressId, {})
+            axios.delete("/address/delete/" + this.deletedAddressId, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            })
                 .then(function (response) {
                     if (response.data.code === 200) {
                         console.log("删除一个地址成功！");
@@ -521,7 +525,11 @@
             alert("导出模块之后一起加上@");
         },
         queryAddressById: function (id) {
-            axios.get("/address/queryAddressById/" + id)
+            axios.get("/address/queryAddressById/" + id, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            })
                 .then(function (response) {
                     console.log(response.data);
                     if (response.data.code === 200) {
@@ -541,6 +549,10 @@
                 name: this.theAddress.address.name,
                 mobile: this.theAddress.address.mobile,
                 addressDetail: this.theAddress.address.addressDetail
+            },{
+                headers:{
+                    Authorization:adminAccessToken
+                }
             }).then(function (response) {
                 if (response.data.code === 200) {
                     alert("修改成功！!!");

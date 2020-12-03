@@ -7,9 +7,9 @@ import com.liyuan.model.MallAd;
 import com.liyuan.model.MallAdExample;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,6 +20,7 @@ public class AdvertisementServiceImpl {
     public PageInfo querySelective(String keyword, Integer page, Integer pageSize, MallAd.Column... columns) {
         MallAdExample mallAdExample = new MallAdExample();
         MallAdExample.Criteria criteria = mallAdExample.createCriteria();
+        mallAdExample.setOrderByClause("id desc");
         criteria.andNameLike("%" + keyword + "%");
         PageHelper.startPage(page, pageSize);
         List<MallAd> mallAds = adMapper.selectByExampleSelective(mallAdExample, columns);
@@ -41,5 +42,14 @@ public class AdvertisementServiceImpl {
 
     public int deleteById(Integer id) {
         return adMapper.deleteByPrimaryKey(id);
+    }
+
+    public List<MallAd> queryByIndexAndDate(Integer position, MallAd.Column... columns) {
+        MallAdExample adExample = new MallAdExample();
+        MallAdExample.Criteria criteria = adExample.createCriteria();
+        criteria.andPositionEqualTo(position);
+        criteria.andStartTimeLessThan(LocalDateTime.now());
+        criteria.andEndTimeGreaterThan(LocalDateTime.now());
+        return adMapper.selectByExampleSelective(adExample, columns);
     }
 }

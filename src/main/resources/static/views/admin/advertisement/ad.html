@@ -294,6 +294,7 @@
                                         <th>标题</th>
                                         <th>链接</th>
                                         <th>图片链接</th>
+                                        <th>预览</th>
                                         <th>位置</th>
                                         <th>内容</th>
                                         <th>开始</th>
@@ -307,20 +308,23 @@
                                         <td>{{item.name}}</td>
                                         <td>{{item.link}}</td>
                                         <td>{{item.url}}</td>
+                                        <td>
+                                            <img :src="item.url" class="img-rounded" style="height: 100px;" alt="">
+                                        </td>
                                         <td>{{item.position}}</td>
                                         <td>{{item.content}}</td>
                                         <td>{{item.startTime}}</td>
                                         <td>{{item.endTime}}</td>
                                         <td>
                                             <button type="button"
-                                                    class="col-lg-5 col-md-12 col-xs-12 col-sm-12 btn btn-primary"
+                                                    class=" col-md-12 col-xs-12 col-sm-12 btn btn-primary"
                                                     @click="queryAdvertisementById(item.id)"
                                                     data-toggle="modal"
                                                     data-target="#myModal">
                                                 修改
                                             </button>
                                             <button type="button"
-                                                    class="col-lg-5 col-md-12 col-xs-12 col-sm-12 btn btn-danger"
+                                                    class="col-md-12 col-xs-12 col-sm-12 btn btn-danger"
                                                     @click="deleteAdById(item.id)">
                                                 删除
                                             </button>
@@ -661,6 +665,7 @@
             })
         },
         addAd: function () {
+            console.log("上传一则广告！");
             axios.post("/advertisement/add", {
                 name: this.aNewAd.name,
                 link: this.aNewAd.link,
@@ -670,16 +675,20 @@
                 startTime: this.aNewAd.startTime,
                 endTime: this.aNewAd.endTime
             }, {
-                headers: adminAccessToken
+                headers: {
+                    Authorization: adminAccessToken
+                }
             }).then(response => {
                 console.log(response.data.message);
                 if (response.data.code === 200) {
-
+                    retrieveAdvertisementByPageAndPageSize(this.pageInfo.pageNum, this.pageInfo.pageSize);
+                    console.log(response.data.data);
+                    alert("上传成功！");
+                    $("#addAdModal").modal("hide");
                 }
             }).catch(err => {
-                // console.log(err);
+                console.log(err);
             })
-
         }
 
     };

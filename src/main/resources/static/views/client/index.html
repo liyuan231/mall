@@ -91,13 +91,16 @@
             background-color: #fff;
             padding: 30px;
         }
-        .row{
-            padding:0 30px;
+
+        .row {
+            padding: 0 30px;
         }
-        .price{
-            color:red;
+
+        .price {
+            color: red;
         }
-        .name{
+
+        .name {
             font-weight: bold;
             /*color: #fff;*/
         }
@@ -109,7 +112,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                 <a class="navbar-brand" href="/views/client/index.html">MALL</a>
+                <a class="navbar-brand" href="/views/client/index.html">MALL</a>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                         data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">MALL</span>
@@ -134,10 +137,10 @@
                     <li class="dropdown" v-if="currentUser.id!==undefined">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
-                            <img :src="currentUser.avatar" class=" img-circle" style="width: 30px;height: 30px;" alt="">
+                            <img :src="currentUser.avatar" class="img-circle" style="width: 30px;height: 30px;" alt="">
                             {{currentUser.username}}
                             <span class="caret"></span></a>
-<!--                        2->表示用户-->
+                        <!--                        2->表示用户-->
                         <ul class="dropdown-menu" v-if="currentUser.role===2">
                             <li><a href="./info.html">我的信息</a></li>
                             <li><a href="./cart.html">我的购物车</a></li>
@@ -147,8 +150,9 @@
                             <li><a @click="this.clientLogout()" href="#">退出</a></li>
                         </ul>
 
-<!--                        3->表示商家-->
+                        <!--                        3->表示商家-->
                         <ul class="dropdown-menu" v-if="currentUser.role===3">
+                            <li><a href="/views/client/store/info.html">我的信息</a></li>
                             <li><a href="./store/publishGoods.html">发布商品</a></li>
                             <li><a href="/views/client/store/myGoods.html">我发布的商品</a></li>
                             <li><a href="./store/orders.html">我收到的订单</a></li>
@@ -178,19 +182,11 @@
 
                 <!-- Wrapper for slides -->
                 <div class="carousel-inner" role="listbox">
-                    <div class="item active">
-                        <img src="./images/bg.jpg" alt="">
-                        <!--                    <div class="carousel-caption">-->
-                        <!--                        ...-->
-                        <!--                    </div>-->
+                    <div class="item" :class="index===0?'active':''" v-for="(item,index) of ads">
+                        <a :href="item.link" target="_blank">
+                            <img :src="item.url" :alt="item.name">
+                        </a>
                     </div>
-                    <div class="item">
-                        <img src="./images/bg.jpg" alt="">
-                        <!--                    <div class="carousel-caption">-->
-                        <!--                        ...-->
-                        <!--                    </div>-->
-                    </div>
-                    ...
                 </div>
 
                 <!-- Controls -->
@@ -273,6 +269,7 @@
 <script src="./js/jquery.min.js"></script>
 <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
 <script src="./js/bootstrap.min.js"></script>
+<script src=""></script>
 <script>
     var retrieveUserByToken = function () {
         console.log(localStorage.getItem("accessToken"));
@@ -346,7 +343,8 @@
                 total: 7,
             },
             currentUser: {},
-            scrollTop: 0
+            scrollTop: 0,
+            ads: []
         },
         methods: {
             handleScroll: function () {
@@ -357,7 +355,7 @@
             retrieveAllCategories();
             retrieveUserByToken();
             retrieveIndexGoods(1, this.newGoods.pageSize);
-
+            retrieveAd(1);
         },
     });
 
