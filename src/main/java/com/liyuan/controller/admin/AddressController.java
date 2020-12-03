@@ -9,6 +9,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ public class AddressController {
     private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize,
                              @RequestParam(value = "keyWord", defaultValue = "", required = false) String keyWord) {
@@ -42,12 +44,14 @@ public class AddressController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object deleteAddressById(@PathVariable("id") Integer id) {
         addressService.deleteById(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "删除一个地址成功！！");
     }
 
     @GetMapping("/queryAddressById/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object queryAddressById(@PathVariable("id") Integer id) {
         MallAddress mallAddress = addressService.queryById(id);
         MallUser mallUser = userService.queryById(mallAddress.getUserId(), MallUser.Column.id, MallUser.Column.username);
@@ -60,6 +64,7 @@ public class AddressController {
     }
 
     @PostMapping("/updateAddressById")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object updateAddressById(@RequestBody MallAddress address) {
         int i = addressService.updateSelectiveById(address);
         return ResponseUtils.build(HttpStatus.OK.value(), "修改地址信息成功！");

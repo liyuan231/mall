@@ -27,4 +27,8 @@ public class MallSystemServiceImpl {
         Assert.notNull(system.getId(), "商城这一则配置的id 不应该为空！");
         return systemMapper.updateByPrimaryKeySelective(system);
     }
+
+    public int insertSelective(MallSystem system) {
+        return systemMapper.insertSelective(system);
+    }
 }

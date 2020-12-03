@@ -6,8 +6,6 @@
     <title>搜索历史管理</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
 
@@ -21,7 +19,7 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
     <!-- Navbar -->
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -73,12 +71,17 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <label for="adminAvatar">
+                        <img :src="currentUser.avatar" class="img-circle elevation-2" alt="User Image">
+                    </label>
+                    <input multiple id="adminAvatar" hidden type="file" name="file" value="上传头像"
+                           @change="uploadAdminAvatar"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">管理员</a>
+                    <a href="" class="d-block">{{currentUser.username}}</a>
                 </div>
             </div>
+
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -178,7 +181,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../system/adminstrator.html" class="nav-link">
+                                <a href="../system/administrator.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
@@ -186,7 +189,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-info-circle nav-icon"></i>
-                                    <p>通知管理</p>
+                                    <p>通知管理(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -198,7 +201,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
-                                    <p>操作日志</p>
+                                    <p>操作日志(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -227,13 +230,13 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>订单配置</p>
+                                    <p>订单配置(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>运费配置</p>
+                                    <p>运费配置(未实现)</p>
                                 </a>
                             </li>
                         </ul>
@@ -249,7 +252,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app">
+    <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -305,12 +308,12 @@
                                                     v-if="pageInfo.hasPreviousPage"
 
                                                     id="example1_previous"
-                                                    @click="this.retrieveAddressByPageAndPageSize(pageInfo.prePage,pageInfo.pageSize)">
+                                                    @click="this.retrieveSearchHistory(pageInfo.prePage,pageInfo.pageSize)">
                                                     <a href="#" aria-controls="example1"
                                                        data-dt-idx="0" tabindex="0"
                                                        class="page-link">上一页</a>
                                                 </li>
-                                                <li @click="this.retrieveAddressByPageAndPageSize(item,pageInfo.pageSize)"
+                                                <li @click="this.retrieveSearchHistory(item,pageInfo.pageSize)"
                                                     v-for="item of pageInfo.navigatepageNums"
                                                     class="paginate_button page-item"
                                                     :class="item===pageInfo.pageNum?'active':''" :key="item">
@@ -321,7 +324,7 @@
                                                        class="page-link">{{item}}</a>
                                                 </li>
                                                 <li v-if="pageInfo.hasNextPage"
-                                                    @click="this.retrieveAddressByPageAndPageSize(pageInfo.nextPage,pageInfo.pageSize)"
+                                                    @click="this.retrieveSearchHistory(pageInfo.nextPage,pageInfo.pageSize)"
                                                     class="paginate_button page-item next disabled" id="example1_next">
                                                     <a href="#" aria-controls="example1" data-dt-idx="2" tabindex="0"
                                                        class="page-link">下一页</a>
@@ -388,13 +391,10 @@
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-
 <script src="../../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="../../dist/js/demo.js"></script>
+<script src="/views/admin/js/common.js"></script>
 <!-- Page specific script -->
 
 <script type="text/javascript">
@@ -421,38 +421,22 @@
             total: -1,
         },
         keyWord: "",
-        deletedAddressId: -1
+        deletedAddressId: -1,
+        currentUser:{}
     };
     var methods = {
         exportAllUserInfos: function () {
             alert("导出模块之后一起加上@");
+        },
+        uploadAdminAvatar: function (event) {
+            updateAdminAvatar(event);
         }
     };
     var computed = {};
     var mounted = function () {
         console.log("初始化第一页的地址");
-        axios.get("/searchHistory/listSearch?page=" + 1 + "&pageSize=" + this.pageInfo.pageSize)
-            .then(function (response) {
-                console.log(response.data);
-                if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (e) {
-            console.log(e);
-        });
-    }
-    var retrieveAddressByPageAndPageSize = function (page, pageSize) {
-        console.log("获取规定的地址");
-        axios.get("/searchHistory/listSearch?page=" + page + "&pageSize=" + pageSize)
-            .then(function (response) {
-                console.log(response.data);
-                if (response.data.code === 200) {
-                    var info = response.data.data;
-                    this.app.pageInfo = info;
-                }
-            }).catch(function (e) {
-            console.log(e);
-        });
+        retrieveAdminByToken();
+        retrieveSearchHistory(this.pageInfo.pageNum,this.pageInfo.pageSize);
     }
 
     var

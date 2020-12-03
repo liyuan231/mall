@@ -62,10 +62,17 @@ public class AdministratorServiceImpl implements UserDetailsService {
         return new User(username, admin.getPassword(), AuthorityUtils.createAuthorityList(role.getName()));
     }
 
-    private MallAdmin queryByUsername(String username) {
+    public MallAdmin queryByUsername(String username, MallAdmin.Column... columns) {
         MallAdminExample adminExample = new MallAdminExample();
         MallAdminExample.Criteria criteria = adminExample.createCriteria();
         criteria.andUsernameEqualTo(username);
-        return adminMapper.selectOneByExampleSelective(adminExample);
+        return adminMapper.selectOneByExampleSelective(adminExample, columns);
+    }
+
+    public int updateSelectiveByUsername(MallAdmin admin) {
+        MallAdminExample adminExample = new MallAdminExample();
+        MallAdminExample.Criteria criteria = adminExample.createCriteria();
+        criteria.andUsernameEqualTo(admin.getUsername());
+        return adminMapper.updateByExampleSelective(admin,adminExample);
     }
 }

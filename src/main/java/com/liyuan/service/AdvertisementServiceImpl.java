@@ -38,4 +38,8 @@ public class AdvertisementServiceImpl {
         Assert.notNull(ad.getId(), "广告id不应为空！");
         return adMapper.updateByPrimaryKeySelective(ad);
     }
+
+    public int deleteById(Integer id) {
+        return adMapper.deleteByPrimaryKey(id);
+    }
 }

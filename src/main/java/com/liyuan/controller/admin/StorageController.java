@@ -1,6 +1,7 @@
 package com.liyuan.controller.admin;
 
 import com.github.pagehelper.PageInfo;
+import com.liyuan.component.cos.COSProperties;
 import com.liyuan.dto.StorageAndUser;
 import com.liyuan.model.MallStorage;
 import com.liyuan.model.MallUser;
@@ -9,6 +10,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,13 +27,19 @@ public class StorageController {
     private StorageServiceImpl storageService;
 
     @Autowired
+    private COSProperties cosProperties;
+    @Autowired
     private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize) {
         PageInfo pageInfo = storageService.querySelective(page, pageSize);
         List<MallStorage> storages = pageInfo.getList();
+        for (MallStorage storage : storages) {
+            storage.setLocation(cosProperties.getBaseUrl() + storage.getLocation());
+        }
         List<StorageAndUser> storageAndUsers = new LinkedList<>();
         for (MallStorage storage : storages) {
             StorageAndUser storageAndUser = new StorageAndUser();

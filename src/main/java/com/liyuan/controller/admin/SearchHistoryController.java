@@ -9,6 +9,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/searchHistory")
+@RequestMapping("/admin/searchHistory")
 public class SearchHistoryController {
 
     @Autowired
@@ -27,6 +28,7 @@ public class SearchHistoryController {
     private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize,
                              @RequestParam(value = "keyWord", defaultValue = "", required = false) String keyWord) {
@@ -41,6 +43,6 @@ public class SearchHistoryController {
             addressAndUsers.add(searchHistoryAndUser);
         }
         pageInfo.setList(addressAndUsers);
-        return ResponseUtils.build(HttpStatus.OK.value(), "获取所哟用户成功！包括关键字", pageInfo);
+        return ResponseUtils.build(HttpStatus.OK.value(), "获取用户搜索历史！", pageInfo);
     }
 }

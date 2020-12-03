@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>系统管理</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
     <script src="../../dist/js/axios.js"></script>
@@ -20,7 +16,7 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
     <!-- Navbar -->
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -74,10 +70,14 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <label for="adminAvatar">
+                        <img :src="currentUser.avatar" class="img-circle elevation-2" alt="User Image">
+                    </label>
+                    <input multiple id="adminAvatar" hidden type="file" name="file" value="上传头像"
+                           @change="uploadAdminAvatar"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">管理员</a>
+                    <a href="" class="d-block">{{currentUser.username}}</a>
                 </div>
             </div>
             <!-- Sidebar Menu -->
@@ -179,15 +179,15 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="tor.html" class="nav-link">
-                                    <i class="far fa-user nav-icon"></i>
+                                <a href="/views/admin/system/administrator.html" class="nav-link"> <i
+                                        class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="far fa-info-circle nav-icon"></i>
-                                    <p>通知管理</p>
+                                    <p>通知管理(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -199,7 +199,7 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
-                                    <p>操作日志</p>
+                                    <p>操作日志(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -228,13 +228,13 @@
                             <li class="nav-item">
                                 <a href="../../pages/forms/general.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>订单配置</p>
+                                    <p>订单配置(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="../../pages/forms/advanced.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>运费配置</p>
+                                    <p>运费配置(未实现)</p>
                                 </a>
                             </li>
                         </ul>
@@ -251,7 +251,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app" v-cloak>
+    <div class="content-wrapper" v-cloak>
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -529,14 +529,8 @@
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-<!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="../../dist/js/demo.js"></script>
+<script src="/views/admin/js/common.js"></script>
 
 <script>
     var data = {
@@ -548,14 +542,22 @@
             permissions: {}
         },
         aNewPermission: "",
-        aNewRole: {}
+        aNewRole: {},
+        currentUser: {}
     };
     var methods = {
+        uploadAdminAvatar(event) {
+            updateAdminAvatar(event);
+        },
         setDeletedId: function (id) {
             this.deletedId = id;
         },
         deleteRoleById: function () {
-            axios.delete("/role/deleteById/" + this.deletedId)
+            axios.delete("/role/deleteById/" + this.deletedId, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            })
                 .then(function (response) {
                     if (response.data.code === 200) {
                         alert("删除成功！");
@@ -567,7 +569,11 @@
             })
         },
         deletePermissionById: function () {
-            axios.delete("/permission/deleteById/" + this.deletedPermissionId)
+            axios.delete("/permission/deleteById/" + this.deletedPermissionId, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            })
                 .then(function (response) {
                     if (response.data.code === 200) {
                         alert("删除成功！");
@@ -579,7 +585,11 @@
             })
         },
         queryRoleById: function (id) {
-            axios.get("/role/queryById/" + id).then(function (response) {
+            axios.get("/role/queryById/" + id, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            }).then(function (response) {
                 if (response.data.code === 200) {
                     this.app.theRole = response.data.data;
                 }
@@ -591,6 +601,10 @@
             axios.post("/permission/add", {
                 roleId: this.theRole.role.id,
                 permission: this.aNewPermission
+            }, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
             }).then(function (response) {
                 alert("添加成功！");
                 this.app.queryRoleById(this.app.theRole.role.id);
@@ -600,6 +614,10 @@
             axios.post("/role/add", {
                 name: this.aNewRole.name,
                 desc: this.aNewRole.desc
+            }, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
             }).then(function (response) {
                 if (response.data.code === 200) {
                     alert("添加成功！");
@@ -612,7 +630,12 @@
         }
     };
     var mounted = function () {
-        axios.get("/role/listSearchAll")
+        retrieveAdminByToken();
+        axios.get("/role/listSearchAll", {
+            headers: {
+                Authorization: adminAccessToken
+            }
+        })
             .then(function (response) {
                 if (response.data.code === 200) {
                     this.app.roles = response.data.data;

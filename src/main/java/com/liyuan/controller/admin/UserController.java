@@ -6,6 +6,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +17,14 @@ public class UserController {
     private UserServiceImpl userService;
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String add(@RequestBody MallUser user) {
         int i = userService.insertSelective(user);
         return ResponseUtils.build(HttpStatus.OK.value(), "添加用户成功");
     }
 
     @PostMapping("/updateUserById")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object updateUserById(@RequestBody MallUser mallUser) {
         int i = userService.updateSelectiveById(mallUser);
         return ResponseUtils.build(HttpStatus.OK.value(), "修改用户信息成功！");
@@ -29,6 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize,
                              @RequestParam(value = "keyWord", defaultValue = "", required = false) String keyWord) {
@@ -37,12 +41,14 @@ public class UserController {
     }
 
     @GetMapping("/queryUserById")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object queryUserById(@RequestParam("id") Integer id) {
         MallUser mallUser = userService.queryById(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取某一用户信息成功！", mallUser);
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String deleteUserById(@PathVariable("id") Integer id) {
         userService.deleteById(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "删除一个用户成功！！");

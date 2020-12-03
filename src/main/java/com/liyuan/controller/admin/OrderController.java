@@ -11,6 +11,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +32,7 @@ public class OrderController {
     private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam(value = "keyword", defaultValue = "", required = false) String keyword,
                              @RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize) {

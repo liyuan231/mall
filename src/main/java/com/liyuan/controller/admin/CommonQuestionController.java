@@ -6,6 +6,7 @@ import com.liyuan.service.CommonQuestionServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,7 @@ public class CommonQuestionController {
     private CommonQuestionServiceImpl commonQuestionService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
                              @RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize) {
@@ -24,12 +26,14 @@ public class CommonQuestionController {
     }
 
     @GetMapping("/queryById/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object queryById(@PathVariable("id") Integer id) {
         MallIssue mallIssue = commonQuestionService.queryById(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取某一则通用问题成功！", mallIssue);
     }
 
     @PostMapping("/updateById")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object updateById(@RequestBody MallIssue issue) {
         int i = commonQuestionService.updateSelectiveByPrimary(issue);
         return ResponseUtils.build(HttpStatus.OK.value(), "修改某一则通用问题成功！");

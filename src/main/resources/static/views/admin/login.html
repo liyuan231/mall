@@ -15,16 +15,17 @@
         }
 
         .container {
-            max-width: 666px;
+            max-width: 555px;
             /*background-color: #fff;*/
             border-radius: 4px;
             padding: 30px;
             margin-top: 120px;
-            color:#fff;
-            border:1px solid #fff;
+            color: #fff;
+            border: 1px solid #fff;
         }
-        .text-danger{
-            color:red;
+
+        .text-danger {
+            color: red;
         }
 
         .form-group .form-control {
@@ -74,9 +75,43 @@
         data: {
             username: "",
             password: "",
-            error:false
+            error: false
         },
-        methods: {},
+        methods: {
+            login: function () {
+                if (this.username === "") {
+                    return;
+                }
+                if (this.password === "") {
+                    return;
+                }
+                console.log(this.username);
+                console.log("执行登录！");
+                axios.post("/admin/login", {
+                    username: this.username,
+                    password: this.password
+                }, {
+                    headers: {
+                        // 'Content-Type': 'application/x-www-form-urlencoded',
+                        // 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+                    },
+                }).then(function (response) {
+                    if (response.data.code === 200) {
+                        console.log("登录成功！");
+                        localStorage.setItem("accessToken", response.data.data.accessToken);
+                        localStorage.setItem("refreshToken", response.data.data.accessToken);
+                        setTimeout(function () {
+                            // alert(1)
+                            window.location.href = "/views/admin/user/user.html";
+                        }, 100)
+                        return;
+                    }
+                    this.app.error = true;
+                }).catch(function (err) {
+                    console.log(err);
+                })
+            }
+        },
         mounted: function () {
 
         }

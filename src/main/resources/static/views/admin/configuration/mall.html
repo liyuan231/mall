@@ -6,9 +6,6 @@
     <title>配置管理</title>
 
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
     <script src="../../dist/js/axios.js"></script>
@@ -20,7 +17,7 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
     <!-- Navbar -->
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -74,10 +71,14 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <label for="adminAvatar">
+                        <img :src="currentUser.avatar" class="img-circle elevation-2" alt="User Image">
+                    </label>
+                    <input multiple id="adminAvatar" hidden type="file" name="file" value="上传头像"
+                           @change="uploadAdminAvatar"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">管理员</a>
+                    <a href="" class="d-block">{{currentUser.username}}</a>
                 </div>
             </div>
             <!-- Sidebar Menu -->
@@ -179,7 +180,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../system/adminstrator.html" class="nav-link">
+                                <a href="../system/administrator.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
@@ -187,7 +188,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-info-circle nav-icon"></i>
-                                    <p>通知管理</p>
+                                    <p>通知管理(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -199,7 +200,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
-                                    <p>操作日志</p>
+                                    <p>操作日志(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -228,13 +229,13 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>订单配置</p>
+                                    <p>订单配置(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>运费配置</p>
+                                    <p>运费配置(未实现)</p>
                                 </a>
                             </li>
                         </ul>
@@ -251,7 +252,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app">
+    <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -276,6 +277,9 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">商城配置</h3>
+                                <button data-toggle="modal" data-target="#addConfiguration" style="float: right"
+                                        class=" btn btn-success">添加配置
+                                </button>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body">
@@ -294,6 +298,35 @@
                     </div>
                     <!-- /.col -->
                 </div>
+                <div class="modal fade" tabindex="-1" role="dialog" id="addConfiguration">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" style="float: left;"></h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="aNewConfigurationKey">关键字</label>
+                                    <input id="aNewConfigurationKey" class="form-control"
+                                           v-model="aNewConfiguration.key"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="aNewConfigurationValue">描述</label>
+                                    <input id="aNewConfigurationValue" class="form-control"
+                                           v-model="aNewConfiguration.value"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-success" @click="addSystemConfiguration">确认
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
                 <!-- /.row -->
             </div>
             <!-- /.container-fluid -->
@@ -322,20 +355,25 @@
 
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-<script src="../../dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="../../dist/js/demo.js"></script>
+<script src="../../dist/js/adminlte.min.js"></script>
+<script src="/views/admin/js/common.js"></script>
 <!-- Page specific script -->
 
 <script>
     data = {
         systems: [],
-        modifiedSystemIds: new Set()
+        modifiedSystemIds: new Set(),
+        currentUser: {},
+        aNewConfiguration: {
+            key: "",
+            value: ""
+        }
     };
     methods = {
+        uploadAdminAvatar(event) {
+            updateAdminAvatar(event);
+        },
         modifySystem: function () {
             var newSystems = [];
             for (var i of this.modifiedSystemIds) {
@@ -347,7 +385,11 @@
             if (newSystems.length === 0) {
                 return;
             }
-            axios.post("/system/batchUpdate", newSystems)
+            axios.post("/system/batchUpdate", newSystems, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            })
                 .then(function (response) {
                     if (response.data.code === 200) {
                         alert("更新商城配置成功！")
@@ -356,18 +398,28 @@
                 }).catch(function (err) {
                 console.log(err);
             })
+        },
+        addSystemConfiguration: function () {
+            axios.post("/system/add", {
+                key: this.aNewConfiguration.key,
+                value: this.aNewConfiguration.value,
+            }, {
+                headers: {
+                    Authorization: adminAccessToken
+                }
+            }).then(response => {
+                console.log(response.data.message);
+                if (response.data.code === 200) {
+                    alert(response.data.message);
+                    retrieveAllSystemConfiguration();
+                    $("#addConfiguration").modal("hide");
+                }
+            })
         }
     };
     mounted = function () {
-        axios.get("/system/listAll")
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    this.app.systems = response.data.data;
-
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
+        retrieveAdminByToken();
+        retrieveAllSystemConfiguration();
     };
 
     var app = new Vue({

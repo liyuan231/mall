@@ -20,7 +20,7 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
     <!-- Navbar -->
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -74,13 +74,16 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <label for="adminAvatar">
+                        <img :src="currentUser.avatar" class="img-circle elevation-2" alt="User Image">
+                    </label>
+                    <input multiple id="adminAvatar" hidden type="file" name="file" value="上传头像"
+                           @change="uploadAdminAvatar"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">管理员</a>
+                    <a href="" class="d-block">{{currentUser.username}}</a>
                 </div>
-            </div>
-            <!-- Sidebar Menu -->
+            </div>            <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -179,7 +182,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../system/adminstrator.html" class="nav-link">
+                                <a href="../system/administrator.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
@@ -187,7 +190,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-info-circle nav-icon"></i>
-                                    <p>通知管理</p>
+                                    <p>通知管理(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -199,7 +202,7 @@
                             <li class="nav-item">
                                 <a href="" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
-                                    <p>操作日志</p>
+                                    <p>操作日志(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -228,13 +231,13 @@
                             <li class="nav-item">
                                 <a href="../../pages/forms/general.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>订单配置</p>
+                                    <p>订单配置(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="../../pages/forms/advanced.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>运费配置</p>
+                                    <p>运费配置(未实现)</p>
                                 </a>
                             </li>
                         </ul>
@@ -250,7 +253,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app">
+    <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -418,30 +421,21 @@
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
+<script src="/views/admin/js/common.js"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="../../dist/js/demo.js"></script>
 <!-- Page specific script -->
 <script>
 
-    var retrieveCommonQuestionByPageAndPageSize = function (page, pageSize) {
-        axios.get("/commonQuestion/listSearch?page=" + page + "&pageSize=" + pageSize)
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
-    }
+
     var methods = {
         queryCommonQuestionById: function (id) {
-            axios.get("/commonQuestion/queryById/" + id)
+            axios.get("/commonQuestion/queryById/" + id,{
+                headers:{
+                    Authorization:adminAccessToken
+                }
+            })
                 .then(function (response) {
                     if (response.data.code === 200) {
                         this.app.theCommonQuestion = response.data.data;
@@ -451,12 +445,19 @@
                 console.log(err);
             })
         },
+        uploadAdminAvatar: function (e) {
+            updateAdminAvatar(e);
+        },
 
         updateCommonQuestionById: function () {
             axios.post("/commonQuestion/updateById", {
                 id: this.theCommonQuestion.id,
                 question: this.theCommonQuestion.question,
                 answer: this.theCommonQuestion.answer
+            },{
+                headers:{
+                    Authorization:adminAccessToken
+                }
             }).then(function (response) {
                 if (response.data.code === 200) {
                     alert("修改成功！");
@@ -492,18 +493,12 @@
             size: 8,
             total: -1,
         },
-        theCommonQuestion: {}
+        theCommonQuestion: {},
+        currentUser: {}
     };
     var mounted = function () {
-        axios.get("/commonQuestion/listSearch?page=1&pageSize=" + this.pageInfo.pageSize)
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    console.log(response.data);
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
+        retrieveAdminByToken();
+        retrieveCommonQuestionByPageAndPageSize(this.pageInfo.pageNum, this.pageInfo.pageSize);
     }
     var app = new Vue({
         el: "#app",

@@ -9,6 +9,7 @@ import com.liyuan.service.UserServiceImpl;
 import com.liyuan.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ public class FeedbackController {
     private UserServiceImpl userService;
 
     @GetMapping("/listSearch")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Object listSearch(@RequestParam("page") Integer page,
                              @RequestParam("pageSize") Integer pageSize,
                              @RequestParam(value = "keyWord", defaultValue = "", required = false) String keyWord) {
@@ -47,6 +49,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/queryFeedbackById/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String queryFeedbackById(@PathVariable("id") Integer id) {
         MallFeedback mallFeedback = feedbackService.queryById(id);
         return ResponseUtils.build(HttpStatus.OK.value(), "获取该则意见反馈", mallFeedback);

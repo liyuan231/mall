@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>系统管理</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
     <script src="../../dist/js/axios.js"></script>
@@ -20,7 +16,7 @@
     </style>
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
     <!-- Navbar -->
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -74,10 +70,14 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <label for="adminAvatar">
+                        <img :src="currentUser.avatar" class="img-circle elevation-2" alt="User Image">
+                    </label>
+                    <input multiple id="adminAvatar" hidden type="file" name="file" value="上传头像"
+                           @change="uploadAdminAvatar"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">管理员</a>
+                    <a href="" class="d-block">{{currentUser.username}}</a>
                 </div>
             </div>
             <!-- Sidebar Menu -->
@@ -179,7 +179,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="tor.html" class="nav-link">
+                                <a href="/views/admin/system/administrator.html" class="nav-link">
                                     <i class="far fa-user nav-icon"></i>
                                     <p>管理员</p>
                                 </a>
@@ -187,7 +187,7 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="far fa-info-circle nav-icon"></i>
-                                    <p>通知管理</p>
+                                    <p>通知管理(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -199,7 +199,7 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="far fa-paper-plane nav-icon"></i>
-                                    <p>操作日志</p>
+                                    <p>操作日志(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -228,13 +228,13 @@
                             <li class="nav-item">
                                 <a href="../../pages/forms/general.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>订单配置</p>
+                                    <p>订单配置(未实现)</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="../../pages/forms/advanced.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>运费配置</p>
+                                    <p>运费配置(未实现)</p>
                                 </a>
                             </li>
                         </ul>
@@ -251,7 +251,7 @@
     <!--  以上均为一致，仅需要微调即可使用-->
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" id="app" v-cloak>
+    <div class="content-wrapper" v-cloak>
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
@@ -283,8 +283,9 @@
                                     <thead>
                                     <tr>
                                         <th>id</th>
-                                        <th>用户</th>
+                                        <th>预览</th>
                                         <th>位置</th>
+                                        <th>父类id</th>
                                         <th>类型</th>
                                         <th>上传时间</th>
                                         <th>操作</th>
@@ -293,12 +294,18 @@
                                     <tbody>
                                     <tr v-for="item of pageInfo.list">
                                         <td>{{item.storage.id}}</td>
-                                        <td>{{item.user.username}}</td>
+                                        <td>
+                                            <img :src="item.storage.location" class="img-rounded"
+                                                 style="height: 100px;" alt="">
+                                        </td>
                                         <td>{{item.storage.location}}</td>
+                                        <td>{{item.storage.targetId}}</td>
                                         <td>{{item.storage.type}}</td>
                                         <td>{{item.storage.updateTime}}</td>
                                         <td>
-                                            <button type="button" class="col-11 btn btn-primary">下载</button>
+                                            <a target="_blank" :href="item.storage.location" type="button"
+                                                    class="col-11 btn btn-primary">下载
+                                            </a>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -374,14 +381,10 @@
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="../../plugins/jszip/jszip.min.js"></script>
-<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
-<!-- AdminLTE App -->
+
 <script src="../../dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="../../dist/js/demo.js"></script>
+<script src="/views/admin/js/common.js"></script>
+
 
 <script>
     var data = {
@@ -395,7 +398,6 @@
             lastPage: 8,
             list: [
                 {
-                    user: {},
                     storage: {}
                 }
             ],
@@ -411,30 +413,20 @@
             size: 8,
             total: -1,
         },
+        currentUser: {}
     };
-    var methods = {};
+    var methods = {
+        uploadAdminAvatar(event) {
+            updateAdminAvatar(event);
+        },
+        downloadFile: function (location) {
+
+        }
+    };
     var mounted = function () {
-        axios.get("/storage/listSearch?page=1&pageSize=" + this.pageInfo.pageSize)
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
+        retrieveAdminByToken();
+        retrieveStorageByPageAndPageSize(this.pageInfo.pageNum, this.pageInfo.pageSize);
     }
-    var retrieveStorageByPageAndPageSize=function (page,pageSize){
-        axios.get("/storage/listSearch?page=" + page + "&pageSize=" + pageSize)
-            .then(function (response) {
-                if (response.data.code === 200) {
-                    this.app.pageInfo = response.data.data;
-                }
-            }).catch(function (err) {
-            console.log(err);
-        })
-    }
-
-
     var app = new Vue({
         el: "#app",
         data: data,
