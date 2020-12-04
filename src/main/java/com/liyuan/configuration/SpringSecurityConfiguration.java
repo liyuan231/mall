@@ -81,7 +81,7 @@ public class SpringSecurityConfiguration {
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
             http.addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             http.csrf().disable().
-                    antMatcher("/client/**").formLogin()
+                    antMatcher("/views/client/**").formLogin()
                     .and().authorizeRequests().anyRequest().permitAll();
             http.userDetailsService(userService);
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -125,9 +125,9 @@ public class SpringSecurityConfiguration {
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
             http.addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             http.csrf().disable().
-                    antMatcher("/admin/**")
+                    antMatcher("/views/admin/**")
                     .formLogin().and()
-                    .authorizeRequests().anyRequest().permitAll();
+                    .authorizeRequests().anyRequest().hasAnyRole("ADMIN");
             http.userDetailsService(userService);
         }
     }

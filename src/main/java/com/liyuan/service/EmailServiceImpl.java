@@ -32,8 +32,9 @@ public class EmailServiceImpl {
 
     public void sendCode(String username) {
         String s = String.valueOf(System.currentTimeMillis());
+        String message = "邮箱验证码是 %s (三分之内有效)";
         String code = s.substring(s.length() - 6);
-        this.send(username, "MALL-邮箱验证码", code);
+        this.send(username, "MALL-邮箱验证码", String.format(message, code));
         codeMap.put(username, code);
     }
 
