@@ -4,4 +4,6 @@ mall-admin-api.iml
 node_modules
 package-lock.json
 
+src/main/resources/application.properties
+src/main/resources/application-dev.properties
 src/main/resources/liyuan.jks
